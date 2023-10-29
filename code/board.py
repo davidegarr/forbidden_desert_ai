@@ -25,12 +25,19 @@ class Tile:
         self.y_coordinate = y_coordinate
 
     def swap(self, other_tile):
+        # swap coordinates
         temp_x, temp_y = self.x_coordinate, self.y_coordinate
         self.x_coordinate, self.y_coordinate = (
             other_tile.x_coordinate,
             other_tile.y_coordinate,
         )
         other_tile.x_coordinate, other_tile.y_coordinate = temp_x, temp_y
+
+        # update the coordinate_to_tile mapping
+        coordinate_to_tile[(self.x_coordinate, self.y_coordinate)] = self
+        coordinate_to_tile[
+            (other_tile.x_coordinate, other_tile.y_coordinate)
+        ] = other_tile
 
     def add_sand(self):
         self.sand += 1
@@ -61,15 +68,16 @@ class Adventurer:
             new_x = current_x
             new_y = current_y
             raise ValueError("Movement not valid. Move outside borders.")
-        
-        if new_x == tiles["storm"].x_coordinate and new_y == tiles["storm"].y_coordinate:
+
+        if (
+            new_x == tiles["storm"].x_coordinate
+            and new_y == tiles["storm"].y_coordinate
+        ):
             new_x = current_x
             new_y = current_y
             raise ValueError("Movement not valid. You can not run into the storm.")
 
-        for tile in tiles:
-            if new_x == tiles[tile].x_coordinate and new_y == tiles[tile].y_coordinate:
-                self.tile = tiles[tile]
+        self.tile = coordinate_to_tile[(new_x, new_y)]
 
     def get_water(self):
         self.water += 1
@@ -129,14 +137,14 @@ for tile_name, tile in tiles.items():
         x, y = all_coordinates.pop()
         tile.set_coordinates(x, y)
 
+# coordinate mapping initialization. Accomplishes O(1) when looking for a tile in a specific coordinate.
+coordinate_to_tile = {}
+for tile_name, tile in tiles.items():
+    coordinate_to_tile[(tile.x_coordinate, tile.y_coordinate)] = tile
+
 initial_sand = [(0, 2), (1, 1), (1, 3), (2, 0), (2, 4), (3, 1), (3, 3), (4, 2)]
 for x_sand_tile, y_sand_tile in initial_sand:
-    for tile in tiles:
-        if (
-            tiles[tile].x_coordinate == x_sand_tile
-            and tiles[tile].y_coordinate == y_sand_tile
-        ):
-            tiles[tile].add_sand()
+    coordinate_to_tile[(x_sand_tile, y_sand_tile)].add_sand()
 
 # dict of adventurers:
 adventurers = {
