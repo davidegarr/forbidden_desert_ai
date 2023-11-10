@@ -1,5 +1,23 @@
 import random
 
+"""
+The Tile class represents a single tile on the Forbidden Desert game board.
+Attributes:
+    name (str): The name of the tile, which is unique and descriptive (e.g., 'oasis', 'water_1').
+    symbol (str): A single-character or short string symbol representing the tile on the board.
+    x_coordinate (int, optional): The x-coordinate of the tile on the board. Defaults to None.
+    y_coordinate (int, optional): The y-coordinate of the tile on the board. Defaults to None.
+    sand (int): The number of sand markers on the tile. Initialized to 0.
+    flipped (bool): A boolean indicating whether the tile has been flipped over. Defaults to False.
+
+Methods:
+    flip(): Marks the tile as flipped over.
+    set_coordinates(x_coordinate, y_coordinate): Sets the tile's position on the board.
+    swap(other_tile): Swaps the position of this tile with another tile on the board.
+    add_sand(): Adds a sand marker to the tile.
+    remove_sand(): Removes a sand marker from the tile, ensuring the count does not go below zero.
+"""
+
 
 class Tile:
     def __init__(
@@ -33,7 +51,6 @@ class Tile:
         )
         other_tile.x_coordinate, other_tile.y_coordinate = temp_x, temp_y
 
-        # update the coordinate_to_tile mapping
         coordinate_to_tile[(self.x_coordinate, self.y_coordinate)] = self
         coordinate_to_tile[
             (other_tile.x_coordinate, other_tile.y_coordinate)
@@ -46,6 +63,23 @@ class Tile:
         self.sand -= 1
         if self.sand < 0:
             self.sand = 0
+
+
+"""
+The Adventurer class represents a player in the Forbidden Desert game.
+Attributes:
+    name (str): The name of the adventurer, indicating the role (e.g., 'archeologist', 'navigator').
+    symbol (str): A unique symbol representing the adventurer on the board.
+    tile (Tile): The tile object on which the adventurer is currently located.
+    water (int): The current water level of the adventurer, starts at 5.
+
+Methods:
+    __str__(): Returns a string representation of the adventurer's current state.
+    move(move): Moves the adventurer to a new tile on the board, based on the provided (x, y) offsets.
+    get_water(): Increases the adventurer's water level by 1, not exceeding the maximum.
+    lose_water(): Decreases the adventurer's water level by 1, not falling below zero.
+    give_water(other_adventurer): Transfers 1 water unit to another adventurer if possible.
+"""
 
 
 class Adventurer:
@@ -98,7 +132,12 @@ class Adventurer:
             other_adventurer.water = 5
 
 
-# Dict of tiles:
+""""
+The tiles dictionary is the equivalent of the stack of tiles that comes with the boardgame.
+The same quantity and type of tiles as within the "real" boardgame is depicted here.
+Each key-value pair consists of a unique tile name and a corresponding Tile object that holds 
+the tile's properties such as its symbol, coordinates, and state (flipped or not, and the amount of sand).
+"""
 tiles = {
     "start": Tile("start", "S"),
     "storm": Tile("storm", "X", 2, 2),
@@ -127,26 +166,38 @@ tiles = {
     "dune_8": Tile("dune_8", "D8"),
 }
 
+""""
+Only the "storm" tile is placed at a particular place (middle of the board: 2,2), the rest are placed at random using the following
+lines of code.
+"""
 all_coordinates = [(x, y) for x in range(5) for y in range(5)]
 all_coordinates.remove((2, 2))
-
 random.shuffle(all_coordinates)
-
 for tile_name, tile in tiles.items():
     if tile.x_coordinate is None and tile.y_coordinate is None:
         x, y = all_coordinates.pop()
         tile.set_coordinates(x, y)
 
-# coordinate mapping initialization. Accomplishes O(1) when looking for a tile in a specific coordinate.
-coordinate_to_tile = {}
-for tile_name, tile in tiles.items():
-    coordinate_to_tile[(tile.x_coordinate, tile.y_coordinate)] = tile
 
-initial_sand = [(0, 2), (1, 1), (1, 3), (2, 0), (2, 4), (3, 1), (3, 3), (4, 2)]
-for x_sand_tile, y_sand_tile in initial_sand:
-    coordinate_to_tile[(x_sand_tile, y_sand_tile)].add_sand()
+def coordinate_to_tile():
+    """"
+    Coordinate mapping initialization. Accomplishes O(1) when looking for a tile given a specific coordinate. Returns the dict.
+    """
+    coordinate_to_tile = {}
+    for tile_name, tile in tiles.items():
+        coordinate_to_tile[(tile.x_coordinate, tile.y_coordinate)] = tile
 
-# dict of adventurers:
+    initial_sand = [(0, 2), (1, 1), (1, 3), (2, 0), (2, 4), (3, 1), (3, 3), (4, 2)]
+    for x_sand_tile, y_sand_tile in initial_sand:
+        coordinate_to_tile[(x_sand_tile, y_sand_tile)].add_sand()
+    
+    return
+
+
+"""
+Here the adventurers dictionary is initialized, after the board is set.
+By default, all adventureres go to the "start" Tile (see method above).
+"""
 adventurers = {
     "archeologist": Adventurer("archeologist", "A"),
     "climber": Adventurer("climber", "C"),
@@ -157,23 +208,40 @@ adventurers = {
 }
 
 
-def print_board():
-    board_representation = [["  " for _ in range(5)] for _ in range(5)]
+def print_board(tiles):
+    """
+    Self-explanatory. This function prints the board to the terminal. It formats the board so its easier to read (same size for each tile, etc).
+    It includes the symbol for the tile, and the amount of sand that it holds, if any.
+    """
+    board_representation = [["" for _ in range(5)] for _ in range(5)]
 
+    # Place tiles on the board
     for tile_name, tile in tiles.items():
         x, y = tile.x_coordinate, tile.y_coordinate
-        symbol = tile.symbol  # Directly access the symbol from the Tile object
+        symbol = tile.symbol
+        sand = f"({tile.sand})" if tile.sand > 0 else " "
 
-        if tile.sand > 0:
-            board_representation[y][x] = symbol + "(" + str(tile.sand) + ")"
-        else:
-            board_representation[y][x] = symbol
+        # Format each cell to have a fixed width for alignment
+        board_representation[y][x] = f"{symbol:<2}{sand:<3}"
 
+    # Print the board
     for row in board_representation:
-        print(" | ".join(row))
-        print("-" * 40)  # Print a separator line
+        print(" | ".join(cell for cell in row))
+        print("-" * (6 * 5 + 4 * 4))  # Adjust the separator length to the cell width
 
 
-print_board()
-for adventurer in adventurers:
-    print(adventurers[adventurer])
+def print_adventurers(adventurers):
+    """ "
+    Self explanatory. Prints each adventurer using the __str__ method in the class to the terminal.
+    """
+    for adventurer in adventurers:
+        print(adventurers[adventurer])
+
+
+def main():
+    print_board(tiles)
+    print_adventurers(adventurers)
+
+
+if __name__ == "__main__":
+    main()
