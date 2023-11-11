@@ -91,11 +91,11 @@ class Adventurer:
         give_water(other_adventurer): Transfers 1 water unit to another adventurer if possible.
     """
 
-    def __init__(self, name, symbol, tile, coorinate_to_tile):
+    def __init__(self, name, symbol, tile, coordinate_to_tile):
         self.name = name
         self.symbol = symbol
         self.tile = tile
-        self.coordinate_to_tile = coorinate_to_tile
+        self.coordinate_to_tile = coordinate_to_tile
         self.water = 5
 
     def __str__(self):
@@ -111,10 +111,7 @@ class Adventurer:
             new_y = current_y
             raise ValueError("Movement not valid. Move outside borders.")
 
-        if (
-            new_x == tiles["storm"].x_coordinate
-            and new_y == tiles["storm"].y_coordinate
-        ):
+        if self.coordinate_to_tile[(new_x, new_y)].name == "storm":
             new_x = current_x
             new_y = current_y
             raise ValueError("Movement not valid. You can not run into the storm.")
@@ -141,7 +138,7 @@ class Adventurer:
 
 
 def initialize_tiles():
-    """ "
+    """
     The tiles dictionary is the equivalent of the stack of tiles that comes with the boardgame.
     The same quantity and type of tiles as within the "real" boardgame is depicted here.
     Each key-value pair consists of a unique tile name and a corresponding Tile object that holds
@@ -205,8 +202,6 @@ def set_tile_coordinates(tiles):
 
     return coordinate_to_tile
 
-
-def initialize_coordinate_mapping(tiles):
     """
     Coordinate mapping initialization. Accomplishes O(1) when looking for a tile given a specific coordinate. Returns the dict.
     """
@@ -285,7 +280,10 @@ def main():
     print_adventurers(adventurers)
 
     tiles["storm"].swap(tiles["start"])
+    adventurers["archeologist"].move((1,1))
+    tiles["start"].swap(tiles["oasis"])
     print_board(tiles)
+    print_adventurers(adventurers)
 
 
 if __name__ == "__main__":
