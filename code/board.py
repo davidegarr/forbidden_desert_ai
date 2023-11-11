@@ -178,6 +178,7 @@ def set_tile_coordinates(tiles):
     """
     Assigns coordinates to the tiles and returns the coordinate_to_tile mapping.
     Only the "storm" tile is placed at a particular place (middle of the board: 2,2), the rest are placed at random.
+    Adds initial sand to board.
     """
     # Assign fixed coordinates to the storm tile
     tiles["storm"].set_coordinates(2, 2)
@@ -200,20 +201,14 @@ def set_tile_coordinates(tiles):
     for tile in tiles.values():
         tile.set_coordinate_mapping(coordinate_to_tile)
 
-    return coordinate_to_tile
-
     """
-    Coordinate mapping initialization. Accomplishes O(1) when looking for a tile given a specific coordinate. Returns the dict.
+    Add initial sand using the .add_sand() method.
     """
-    coordinate_to_tile = {}
-    for tile_name, tile in tiles.items():
-        coordinate_to_tile[(tile.x_coordinate, tile.y_coordinate)] = tile
-
     initial_sand = [(0, 2), (1, 1), (1, 3), (2, 0), (2, 4), (3, 1), (3, 3), (4, 2)]
     for x_sand_tile, y_sand_tile in initial_sand:
         coordinate_to_tile[(x_sand_tile, y_sand_tile)].add_sand()
 
-    return
+    return coordinate_to_tile
 
 
 def initialize_adventurers(tiles, coordinate_to_tile):
