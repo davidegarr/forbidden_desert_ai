@@ -51,7 +51,7 @@ class Tile:
         self.x_coordinate = x_coordinate
         self.y_coordinate = y_coordinate
 
-    def swap(self, other_tile):
+    def swap(self, other_tile, coordinate_to_tile):
         # swap coordinates
         temp_x, temp_y = self.x_coordinate, self.y_coordinate
         self.x_coordinate, self.y_coordinate = (
@@ -60,10 +60,9 @@ class Tile:
         )
         other_tile.x_coordinate, other_tile.y_coordinate = temp_x, temp_y
 
-        self.coordinate_to_tile[(self.x_coordinate, self.y_coordinate)] = self
-        self.coordinate_to_tile[
-            (other_tile.x_coordinate, other_tile.y_coordinate)
-        ] = other_tile
+        # Update the shared mapping with new coordinates
+        coordinate_to_tile[(self.x_coordinate, self.y_coordinate)] = self
+        coordinate_to_tile[(other_tile.x_coordinate, other_tile.y_coordinate)] = other_tile
 
     def add_sand(self):
         self.sand += 1
@@ -270,15 +269,6 @@ def main():
     for tile in tiles.values():
         tile.coordinate_to_tile = coordinate_to_tile
     adventurers = initialize_adventurers(tiles, coordinate_to_tile)
-
-    print_board(tiles)
-    print_adventurers(adventurers)
-
-    tiles["storm"].swap(tiles["start"])
-    adventurers["archeologist"].move((1,1))
-    tiles["start"].swap(tiles["oasis"])
-    print_board(tiles)
-    print_adventurers(adventurers)
 
 
 if __name__ == "__main__":
