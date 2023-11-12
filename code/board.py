@@ -24,6 +24,7 @@ class Tile:
         self,
         name,
         symbol,
+        coordinate_to_tile,
         x_coordinate=None,
         y_coordinate=None,
         flipped=False,
@@ -34,7 +35,7 @@ class Tile:
         self.y_coordinate = y_coordinate
         self.sand = 0
         self.flipped = flipped
-        self.coordinate_to_tile = None
+        self.coordinate_to_tile = coordinate_to_tile
 
     def __str__(self):
         return (
@@ -136,7 +137,7 @@ class Adventurer:
             other_adventurer.water = 5
 
 
-def initialize_tiles():
+def initialize_tiles(coordinate_to_tile):
     """
     The tiles dictionary is the equivalent of the stack of tiles that comes with the boardgame.
     The same quantity and type of tiles as within the "real" boardgame is depicted here.
@@ -144,31 +145,31 @@ def initialize_tiles():
     the tile's properties such as its symbol, coordinates, and state (flipped or not, and the amount of sand).
     """
     tiles = {
-        "start": Tile("start", "S"),
-        "storm": Tile("storm", "X"),
-        "tunnel_1": Tile("tunnel_1", "T1"),
-        "tunnel_2": Tile("tunnel_2", "T2"),
-        "tunnel_3": Tile("tunnel_3", "T3"),
-        "boat": Tile("boat", "B"),
-        "gem_h": Tile("gem_h", "Gh"),
-        "gem_v": Tile("gem_v", "Gv"),
-        "motor_h": Tile("motor_h", "Mh"),
-        "motor_v": Tile("motor_v", "Mv"),
-        "compass_h": Tile("compass_h", "Ch"),
-        "compass_v": Tile("compass_v", "Cv"),
-        "propeller_h": Tile("propeller_h", "Ph"),
-        "propeller_v": Tile("propeller_v", "Pv"),
-        "water_1": Tile("water_1", "W1"),
-        "water_2": Tile("water_2", "W2"),
-        "oasis": Tile("oasis", "O"),
-        "dune_1": Tile("dune_1", "D1"),
-        "dune_2": Tile("dune_2", "D2"),
-        "dune_3": Tile("dune_3", "D3"),
-        "dune_4": Tile("dune_4", "D4"),
-        "dune_5": Tile("dune_5", "D5"),
-        "dune_6": Tile("dune_6", "D6"),
-        "dune_7": Tile("dune_7", "D7"),
-        "dune_8": Tile("dune_8", "D8"),
+        "start": Tile("start", "S", coordinate_to_tile),
+        "storm": Tile("storm", "X", coordinate_to_tile),
+        "tunnel_1": Tile("tunnel_1", "T1", coordinate_to_tile),
+        "tunnel_2": Tile("tunnel_2", "T2", coordinate_to_tile),
+        "tunnel_3": Tile("tunnel_3", "T3", coordinate_to_tile),
+        "boat": Tile("boat", "B", coordinate_to_tile),
+        "gem_h": Tile("gem_h", "Gh", coordinate_to_tile),
+        "gem_v": Tile("gem_v", "Gv", coordinate_to_tile),
+        "motor_h": Tile("motor_h", "Mh", coordinate_to_tile),
+        "motor_v": Tile("motor_v", "Mv", coordinate_to_tile),
+        "compass_h": Tile("compass_h", "Ch", coordinate_to_tile),
+        "compass_v": Tile("compass_v", "Cv", coordinate_to_tile),
+        "propeller_h": Tile("propeller_h", "Ph", coordinate_to_tile),
+        "propeller_v": Tile("propeller_v", "Pv", coordinate_to_tile),
+        "water_1": Tile("water_1", "W1", coordinate_to_tile),
+        "water_2": Tile("water_2", "W2", coordinate_to_tile),
+        "oasis": Tile("oasis", "O", coordinate_to_tile),
+        "dune_1": Tile("dune_1", "D1", coordinate_to_tile),
+        "dune_2": Tile("dune_2", "D2", coordinate_to_tile),
+        "dune_3": Tile("dune_3", "D3", coordinate_to_tile),
+        "dune_4": Tile("dune_4", "D4", coordinate_to_tile),
+        "dune_5": Tile("dune_5", "D5", coordinate_to_tile),
+        "dune_6": Tile("dune_6", "D6", coordinate_to_tile),
+        "dune_7": Tile("dune_7", "D7", coordinate_to_tile),
+        "dune_8": Tile("dune_8", "D8", coordinate_to_tile),
     }
     return tiles
 
@@ -264,11 +265,12 @@ def print_adventurers(adventurers):
 
 
 def main():
-    tiles = initialize_tiles()
+    coordinate_to_tile = {}
+    tiles = initialize_tiles(coordinate_to_tile)
     coordinate_to_tile = set_tile_coordinates(tiles)
-    for tile in tiles.values():
-        tile.coordinate_to_tile = coordinate_to_tile
     adventurers = initialize_adventurers(tiles, coordinate_to_tile)
+
+    print_board(tiles)
 
 
 if __name__ == "__main__":
