@@ -99,7 +99,7 @@ class Adventurer:
         self.water = 5
 
     def __str__(self):
-        return f"{self.name} at {self.tile.name}. Symbol: {self.symbol}."
+        return f"{self.name} ({self.symbol}) at {self.tile.name}."
 
     def move(self, move):
         x_move, y_move = move
@@ -135,6 +135,42 @@ class Adventurer:
         other_adventurer.water += 1
         if other_adventurer.water > 5:
             other_adventurer.water = 5
+
+
+class Deck:
+    def __init__(self):
+        self.deck = self.initialize_deck()
+    
+    def initialize_deck(self):
+        #create deck of cards
+        deck = []
+
+        #add storm cards
+        storm_patterns = [(1,0), (0,1), (-1,0), (0,-1)]
+        #1 move cards
+        for pattern in storm_patterns:
+            for _ in range(3):
+                deck.append(StormCard("Storm Moves", [pattern]))
+        
+        #2 move cards
+        for pattern in storm_patterns:
+            for _ in range(2):
+                deck.append(StormCard("Storm Moves", [pattern, pattern]))
+        
+        #3 move cards
+        for pattern in storm_patterns:
+            for _ in range(1):
+                deck.append(StormCard("Storm Moves", [pattern, pattern, pattern]))
+
+        #add sun betas down cards
+        for _ in range(4):
+            deck.append(SBDCard("Sun Beats Down"))
+        
+        #add storm picks up cards
+        for _ in range(3):
+            deck.append(SPUCard("Storm Picks Up"))
+        
+        return deck
 
 
 def initialize_tiles(coordinate_to_tile):
@@ -271,6 +307,7 @@ def main():
     adventurers = initialize_adventurers(tiles, coordinate_to_tile)
 
     print_board(tiles)
+    print_adventurers(adventurers)
 
 
 if __name__ == "__main__":
