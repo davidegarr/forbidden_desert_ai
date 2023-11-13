@@ -149,28 +149,46 @@ class Deck:
         storm_patterns = [(1,0), (0,1), (-1,0), (0,-1)]
         #1 move cards
         for pattern in storm_patterns:
-            for _ in range(3):
-                deck.append(StormCard("Storm Moves", [pattern]))
+            for i in range(3):
+                deck.append(StormCard(f"Storm Moves {i}", [pattern]))
         
         #2 move cards
         for pattern in storm_patterns:
-            for _ in range(2):
-                deck.append(StormCard("Storm Moves", [pattern, pattern]))
+            for i in range(2):
+                deck.append(StormCard(f"Storm Moves {i}", [pattern, pattern]))
         
         #3 move cards
         for pattern in storm_patterns:
-            for _ in range(1):
-                deck.append(StormCard("Storm Moves", [pattern, pattern, pattern]))
+            for i in range(1):
+                deck.append(StormCard(f"Storm Moves {i}", [pattern, pattern, pattern]))
 
         #add sun betas down cards
-        for _ in range(4):
-            deck.append(SBDCard("Sun Beats Down"))
+        for i in range(4):
+            deck.append(SBDCard(f"Sun Beats Down {i}"))
         
         #add storm picks up cards
-        for _ in range(3):
-            deck.append(SPUCard("Storm Picks Up"))
+        for i in range(3):
+            deck.append(SPUCard(f"Storm Picks Up {i}"))
         
         return deck
+
+
+class StormCard:
+    def __init__(self, name, move):
+        self.name = name
+        self.move = move
+
+
+class SBDCard:
+    def __init__(self, name):
+        self.name = name
+
+
+class SPUCard:
+    def __init__(self, name):
+        self.name = name
+
+
 
 
 def initialize_tiles(coordinate_to_tile):
