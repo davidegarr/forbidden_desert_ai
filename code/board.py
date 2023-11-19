@@ -36,7 +36,7 @@ class Tile:
         self.y_coordinate = y_coordinate
         self.sand = 0
         self.flipped = flipped
-        self.blocked = False
+        self.blocked = blocked
         self.coordinate_to_tile = coordinate_to_tile
         self.adventurers = []  # List of adventurers on this tile
 
