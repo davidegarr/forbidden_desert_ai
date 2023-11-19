@@ -174,9 +174,21 @@ class Deck:
 
 
 class StormCard:
-    def __init__(self, name, move):
+    def __init__(self, name, moves):
         self.name = name
-        self.move = move
+        self.moves = moves
+    
+    def apply(self, storm, coordinate_to_tile):
+        for move in self.moves:
+            x_move, y_move = move
+            new_x = storm.x_coordinate + x_move
+            new_y = storm.y_coordinate + y_move
+
+            # Check if the move is within board boundaries
+            if 0 <= new_x <= 4 and 0 <= new_y <= 4:
+                adjacent_tile = coordinate_to_tile[(new_x, new_y)]
+                storm.swap(adjacent_tile, coordinate_to_tile)
+            
 
 
 class SBDCard:
