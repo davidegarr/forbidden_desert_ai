@@ -28,6 +28,7 @@ class Tile:
         x_coordinate=None,
         y_coordinate=None,
         flipped=False,
+        blocked=False
     ):
         self.name = name
         self.symbol = symbol
@@ -35,6 +36,7 @@ class Tile:
         self.y_coordinate = y_coordinate
         self.sand = 0
         self.flipped = flipped
+        self.blocked = False
         self.coordinate_to_tile = coordinate_to_tile
         self.adventurers = []  # List of adventurers on this tile
 
@@ -77,11 +79,16 @@ class Tile:
 
     def add_sand(self):
         self.sand += 1
+        if self.sand > 1:
+            self.blocked = True
 
     def remove_sand(self):
         self.sand -= 1
         if self.sand < 0:
             self.sand = 0
+
+        if self.sand < 2:
+            self.blocked = False
 
 
 class Adventurer:
@@ -126,6 +133,11 @@ class Adventurer:
             new_y = current_y
             raise ValueError("Movement not valid. You can not run into the storm.")
 
+        if self.coordinate_to_tile[(new_x, new_y)].blocked == True:
+            new_x = current_x
+            new_y = current_y
+            raise ValueError("Movement not valid. Destination tile is blocked.")
+        
         self.tile.remove_adventurer(self)
 
         self.tile = self.coordinate_to_tile[(new_x, new_y)]
