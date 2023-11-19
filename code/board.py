@@ -225,9 +225,9 @@ class SBDCard:
         self.name = name
     
     def apply(self, tiles):
-        for tile in tiles:
-            if tiles[tile].flipped == False and "tunnel" not in tiles[tile].name:
-                for adventurer in tiles[tile].adventurers:
+        for tile in tiles.values():
+            if not tile.flipped and "tunnel" not in tile.name:
+                for adventurer in tile.adventurers:
                     adventurer.lose_water()
 
 
