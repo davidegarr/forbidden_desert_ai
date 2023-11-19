@@ -108,13 +108,34 @@ class Adventurer:
         give_water(other_adventurer): Transfers 1 water unit to another adventurer if possible.
     """
 
-    def __init__(self, name, symbol, tile, coordinate_to_tile):
+    def __init__(self, name, symbol, tile, water, coordinate_to_tile):
         self.name = name
         self.symbol = symbol
         self.tile = tile
         self.coordinate_to_tile = coordinate_to_tile
-        self.water = 5
+        self.water = water
+        self.max_water = water
 
+    def available_tiles(self):
+        accessible_tiles = [self.tile]
+        current_x, current_y = self.tile.x_coordinate, self.tile.y_coordinate
+
+        directions = [(-1, 0), (1, 0), (0, 1), (0, -1)]
+
+        for dx, dy in directions:
+            new_x, new_y = current_x + dx, current_y + dy
+
+            # Check if the new coordinates are within the board boundaries
+            if 0 <= new_x <= 4 and 0 <= new_y <= 4:
+                adjacent_tile = self.coordinate_to_tile.get((new_x, new_y))
+
+                # Check if the adjacent tile is not the storm tile
+                if adjacent_tile and adjacent_tile.name != "storm":
+                    accessible_tiles.append(adjacent_tile)
+
+        return accessible_tiles
+        
+    
     def __str__(self):
         return f"{self.name} ({self.symbol}) at {self.tile.name}. {self.water} water left."
 
@@ -155,13 +176,54 @@ class Adventurer:
             self.water = 0
 
     def give_water(self, other_adventurer):
-        if self.water == 1:
+        if self.water == 0:
             raise ValueError("Not enough water to give.")
+        if other_adventurer.water == other_adventurer.max_water:
+            raise ValueError ("Cannot give water. Full deposit.")
+        
         self.water -= 1
         other_adventurer.water += 1
-        if other_adventurer.water > 5:
-            other_adventurer.water = 5
+    
+    def clear_sand(self, tile_to_clear):
+        if tile_to_clear in self.available_tiles:
+            tile_to_clear.remove_sand()
 
+
+
+
+class Archeologist(Adventurer):
+    def __init__(self, name, symbol, tile, water, coordinate_to_tile):
+        super().__init__(name, symbol, tile, water, coordinate_to_tile)
+
+    def ability(self, tile_to_clear):
+        if tile_to_clear in self.available_tiles:
+            tile_to_clear.remove_sand()
+            tile_to_clear.remove_sand()
+
+class Climber(Adventurer):
+    def __init__(self, name, symbol, tile, water, coordinate_to_tile):
+        super().__init__(name, symbol, tile, water, coordinate_to_tile)
+
+class Explorer(Adventurer):
+    def __init__(self, name, symbol, tile, water, coordinate_to_tile):
+        super().__init__(name, symbol, tile, water, coordinate_to_tile)
+
+class Meteorologist(Adventurer):
+    def __init__(self, name, symbol, tile, water, coordinate_to_tile):
+        super().__init__(name, symbol, tile, water, coordinate_to_tile)
+
+class Navigator(Adventurer):
+    def __init__(self, name, symbol, tile, water, coordinate_to_tile):
+        super().__init__(name, symbol, tile, water, coordinate_to_tile)
+
+class WaterCarrier(Adventurer):
+    def __init__(self, name, symbol, tile, water, coordinate_to_tile):
+        super().__init__(name, symbol, tile, water, coordinate_to_tile)
+    
+    def ability(self):
+        if self.tile.flipped == True and "water" in self.tile.name and self.tile.blocked == False:
+            self.get_water()
+            self.get_water()
 
 class Deck:
     def __init__(self):
@@ -316,17 +378,17 @@ def initialize_adventurers(tiles, coordinate_to_tile):
     By default, all adventureres go to the "start" Tile (see method above).
     """
     adventurers = {
-        "archeologist": Adventurer(
-            "archeologist", "A", tiles["start"], coordinate_to_tile
+        "archeologist": Archeologist(
+            "archeologist", "A", tiles["start"], 3, coordinate_to_tile
         ),
-        "climber": Adventurer("climber", "C", tiles["start"], coordinate_to_tile),
-        "explorer": Adventurer("explorer", "E", tiles["start"], coordinate_to_tile),
-        "meteorologist": Adventurer(
-            "meteorologist", "M", tiles["start"], coordinate_to_tile
+        "climber": Climber("climber", "C", tiles["start"], 3, coordinate_to_tile),
+        "explorer": Explorer("explorer", "E", tiles["start"], 4, coordinate_to_tile),
+        "meteorologist": Meteorologist(
+            "meteorologist", "M", tiles["start"], 4, coordinate_to_tile
         ),
-        "navigator": Adventurer("navigator", "N", tiles["start"], coordinate_to_tile),
-        "water_carrier": Adventurer(
-            "water_carrier", "WC", tiles["start"], coordinate_to_tile
+        "navigator": Navigator("navigator", "N", tiles["start"], 4, coordinate_to_tile),
+        "water_carrier": WaterCarrier(
+            "water_carrier", "WC", tiles["start"], 5, coordinate_to_tile
         ),
     }
 
