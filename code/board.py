@@ -38,6 +38,7 @@ class Tile:
         self.coordinate_to_tile = coordinate_to_tile
         self.adventurers = []  # List of adventurers on this tile
 
+
     def __str__(self):
         return (
             f"{self.name} at {self.x_coordinate, self.y_coordinate}. Sand: {self.sand}."
@@ -108,7 +109,7 @@ class Adventurer:
         self.water = 5
 
     def __str__(self):
-        return f"{self.name} ({self.symbol}) at {self.tile.name}."
+        return f"{self.name} ({self.symbol}) at {self.tile.name}. {self.water} water left."
 
     def move(self, move):
         x_move, y_move = move
@@ -200,6 +201,10 @@ class StormCard:
             # Check if the move is within board boundaries
             if 0 <= new_x <= 4 and 0 <= new_y <= 4:
                 adjacent_tile = coordinate_to_tile[(new_x, new_y)]
+                adjacent_tile.add_sand()
+                for adventurer in adjacent_tile.adventurers:
+                    adventurer.lose_water()
+                
                 storm.swap(adjacent_tile, coordinate_to_tile)
 
 
@@ -307,6 +312,10 @@ def initialize_adventurers(tiles, coordinate_to_tile):
         ),
     }
 
+    # add the adventurers to the start tile
+    for adventurer in adventurers:
+        tiles["start"].add_adventurer(adventurers[adventurer])
+
     return adventurers
 
 
@@ -345,6 +354,13 @@ def main():
     tiles = initialize_tiles(coordinate_to_tile)
     coordinate_to_tile = set_tile_coordinates(tiles)
     adventurers = initialize_adventurers(tiles, coordinate_to_tile)
+
+    # Example usage
+    storm_tile = tiles["storm"]  # Assuming tiles is already initialized
+    storm_card = StormCard("Storm Moves", [(1, 0), (1, 0)])  # Example for "two right"
+
+    # To apply the storm card
+    storm_card.apply(storm_tile, coordinate_to_tile)
 
     print_board(tiles)
     print_adventurers(adventurers)
