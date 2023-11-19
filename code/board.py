@@ -211,6 +211,12 @@ class StormCard:
 class SBDCard:
     def __init__(self, name):
         self.name = name
+    
+    def apply(self, tiles):
+        for tile in tiles:
+            if tiles[tile].flipped == False and "tunnel" not in tiles[tile].name:
+                for adventurer in tiles[tile].adventurers:
+                    adventurer.lose_water()
 
 
 class SPUCard:
@@ -361,6 +367,13 @@ def main():
 
     # To apply the storm card
     storm_card.apply(storm_tile, coordinate_to_tile)
+
+    print_board(tiles)
+    print_adventurers(adventurers)
+
+    adventurers["archeologist"].move((0,1))
+    SBD_card = SBDCard("Sun Beats down")
+    SBD_card.apply(tiles)
 
     print_board(tiles)
     print_adventurers(adventurers)
