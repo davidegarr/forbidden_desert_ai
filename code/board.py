@@ -36,11 +36,18 @@ class Tile:
         self.sand = 0
         self.flipped = flipped
         self.coordinate_to_tile = coordinate_to_tile
+        self.adventurers = []  # List of adventurers on this tile
 
     def __str__(self):
         return (
             f"{self.name} at {self.x_coordinate, self.y_coordinate}. Sand: {self.sand}."
         )
+
+    def add_adventurer(self, adventurer):
+        self.adventurers.append(adventurer)
+
+    def remove_adventurer(self, adventurer):
+        self.adventurers.remove(adventurer)
 
     def set_coordinate_mapping(self, coordinate_to_tile):
         self.coordinate_to_tile = coordinate_to_tile
@@ -63,7 +70,9 @@ class Tile:
 
         # Update the shared mapping with new coordinates
         coordinate_to_tile[(self.x_coordinate, self.y_coordinate)] = self
-        coordinate_to_tile[(other_tile.x_coordinate, other_tile.y_coordinate)] = other_tile
+        coordinate_to_tile[
+            (other_tile.x_coordinate, other_tile.y_coordinate)
+        ] = other_tile
 
     def add_sand(self):
         self.sand += 1
@@ -116,7 +125,11 @@ class Adventurer:
             new_y = current_y
             raise ValueError("Movement not valid. You can not run into the storm.")
 
+        self.tile.remove_adventurer(self)
+
         self.tile = self.coordinate_to_tile[(new_x, new_y)]
+
+        self.tile.add_adventurer(self)
 
     def get_water(self):
         self.water += 1
@@ -140,36 +153,36 @@ class Adventurer:
 class Deck:
     def __init__(self):
         self.deck = self.initialize_deck()
-    
+
     def initialize_deck(self):
-        #create deck of cards
+        # create deck of cards
         deck = []
 
-        #add storm cards
-        storm_patterns = [(1,0), (0,1), (-1,0), (0,-1)]
-        #1 move cards
+        # add storm cards
+        storm_patterns = [(1, 0), (0, 1), (-1, 0), (0, -1)]
+        # 1 move cards
         for pattern in storm_patterns:
             for i in range(3):
                 deck.append(StormCard(f"Storm Moves {i}", [pattern]))
-        
-        #2 move cards
+
+        # 2 move cards
         for pattern in storm_patterns:
             for i in range(2):
                 deck.append(StormCard(f"Storm Moves {i}", [pattern, pattern]))
-        
-        #3 move cards
+
+        # 3 move cards
         for pattern in storm_patterns:
             for i in range(1):
                 deck.append(StormCard(f"Storm Moves {i}", [pattern, pattern, pattern]))
 
-        #add sun betas down cards
+        # add sun betas down cards
         for i in range(4):
             deck.append(SBDCard(f"Sun Beats Down {i}"))
-        
-        #add storm picks up cards
+
+        # add storm picks up cards
         for i in range(3):
             deck.append(SPUCard(f"Storm Picks Up {i}"))
-        
+
         return deck
 
 
@@ -177,7 +190,7 @@ class StormCard:
     def __init__(self, name, moves):
         self.name = name
         self.moves = moves
-    
+
     def apply(self, storm, coordinate_to_tile):
         for move in self.moves:
             x_move, y_move = move
@@ -188,7 +201,6 @@ class StormCard:
             if 0 <= new_x <= 4 and 0 <= new_y <= 4:
                 adjacent_tile = coordinate_to_tile[(new_x, new_y)]
                 storm.swap(adjacent_tile, coordinate_to_tile)
-            
 
 
 class SBDCard:
@@ -199,8 +211,6 @@ class SBDCard:
 class SPUCard:
     def __init__(self, name):
         self.name = name
-
-
 
 
 def initialize_tiles(coordinate_to_tile):
