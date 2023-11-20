@@ -28,7 +28,7 @@ class Tile:
         x_coordinate=None,
         y_coordinate=None,
         flipped=False,
-        blocked=False
+        blocked=False,
     ):
         self.name = name
         self.symbol = symbol
@@ -39,7 +39,6 @@ class Tile:
         self.blocked = blocked
         self.coordinate_to_tile = coordinate_to_tile
         self.adventurers = []  # List of adventurers on this tile
-
 
     def __str__(self):
         return (
@@ -134,7 +133,7 @@ class Adventurer:
                     accessible_tiles.append(adjacent_tile)
 
         return accessible_tiles
-    
+
     def available_moves(self):
         accessible_tiles = []
         current_x, current_y = self.tile.x_coordinate, self.tile.y_coordinate
@@ -153,10 +152,11 @@ class Adventurer:
                     accessible_tiles.append(adjacent_tile)
 
         return accessible_tiles
-        
-    
+
     def __str__(self):
-        return f"{self.name} ({self.symbol}) at {self.tile.name}. {self.water} water left."
+        return (
+            f"{self.name} ({self.symbol}) at {self.tile.name}. {self.water} water left."
+        )
 
     def move(self, move):
         x_move, y_move = move
@@ -177,7 +177,7 @@ class Adventurer:
             new_x = current_x
             new_y = current_y
             raise ValueError("Movement not valid. Destination tile is blocked.")
-        
+
         self.tile.remove_adventurer(self)
 
         self.tile = self.coordinate_to_tile[(new_x, new_y)]
@@ -198,11 +198,11 @@ class Adventurer:
         if self.water == 0:
             raise ValueError("Not enough water to give.")
         if other_adventurer.water == other_adventurer.max_water:
-            raise ValueError ("Cannot give water. Full deposit.")
-        
+            raise ValueError("Cannot give water. Full deposit.")
+
         self.water -= 1
         other_adventurer.water += 1
-    
+
     def clear_sand(self, tile_to_clear):
         if tile_to_clear in self.available_sand:
             tile_to_clear.remove_sand()
@@ -217,42 +217,52 @@ class Archeologist(Adventurer):
             tile_to_clear.remove_sand()
             tile_to_clear.remove_sand()
 
+
 class Climber(Adventurer):
     def __init__(self, name, symbol, tile, water, coordinate_to_tile):
         super().__init__(name, symbol, tile, water, coordinate_to_tile)
+
 
 class Explorer(Adventurer):
     def __init__(self, name, symbol, tile, water, coordinate_to_tile):
         super().__init__(name, symbol, tile, water, coordinate_to_tile)
 
+
 class Meteorologist(Adventurer):
     def __init__(self, name, symbol, tile, water, coordinate_to_tile):
         super().__init__(name, symbol, tile, water, coordinate_to_tile)
 
+
 class Navigator(Adventurer):
     def __init__(self, name, symbol, tile, water, coordinate_to_tile):
         super().__init__(name, symbol, tile, water, coordinate_to_tile)
-    
+
     def ability(self, other_adventurer, move):
         x_move, y_move = move
 
         new_x = other_adventurer.tile.x_coordinate + x_move
         new_y = other_adventurer.tile.y_coordinate + y_move
 
-        if (0 <= new_x <= 4 and 0 <= new_y <= 4) and not self.coordinate_to_tile[(new_x, new_y)].blocked:
-
+        if (0 <= new_x <= 4 and 0 <= new_y <= 4) and not self.coordinate_to_tile[
+            (new_x, new_y)
+        ].blocked:
             other_adventurer.tile.remove_adventurer(other_adventurer)
             other_adventurer.tile = self.coordinate_to_tile[(new_x, new_y)]
             other_adventurer.tile.add_adventurer(other_adventurer)
         else:
             raise ValueError("Invalid move for Navigator's ability.")
 
+
 class WaterCarrier(Adventurer):
     def __init__(self, name, symbol, tile, water, coordinate_to_tile):
         super().__init__(name, symbol, tile, water, coordinate_to_tile)
-    
+
     def ability(self):
-        if self.tile.flipped == True and "water" in self.tile.name and self.tile.blocked == False:
+        if (
+            self.tile.flipped == True
+            and "water" in self.tile.name
+            and self.tile.blocked == False
+        ):
             self.get_water()
             self.get_water()
 
@@ -310,14 +320,14 @@ class StormCard:
                 adjacent_tile.add_sand()
                 for adventurer in adjacent_tile.adventurers:
                     adventurer.lose_water()
-                
+
                 storm.swap(adjacent_tile, coordinate_to_tile)
 
 
 class SBDCard:
     def __init__(self, name):
         self.name = name
-    
+
     def apply(self, tiles):
         for tile in tiles.values():
             if not tile.flipped and "tunnel" not in tile.name:
@@ -477,7 +487,7 @@ def main():
     print_board(tiles)
     print_adventurers(adventurers)
 
-    adventurers["archeologist"].move((0,1))
+    adventurers["archeologist"].move((0, 1))
     SBD_card = SBDCard("Sun Beats down")
     SBD_card.apply(tiles)
 
