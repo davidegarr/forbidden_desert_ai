@@ -116,8 +116,27 @@ class Adventurer:
         self.water = water
         self.max_water = water
 
-    def available_tiles(self):
+    def available_sand(self):
         accessible_tiles = [self.tile]
+        current_x, current_y = self.tile.x_coordinate, self.tile.y_coordinate
+
+        directions = [(-1, 0), (1, 0), (0, 1), (0, -1)]
+
+        for dx, dy in directions:
+            new_x, new_y = current_x + dx, current_y + dy
+
+            # Check if the new coordinates are within the board boundaries
+            if 0 <= new_x <= 4 and 0 <= new_y <= 4:
+                adjacent_tile = self.coordinate_to_tile.get((new_x, new_y))
+
+                # Check if the adjacent tile is not the storm tile
+                if adjacent_tile and adjacent_tile.name != "storm":
+                    accessible_tiles.append(adjacent_tile)
+
+        return accessible_tiles
+    
+    def available_moves(self):
+        accessible_tiles = []
         current_x, current_y = self.tile.x_coordinate, self.tile.y_coordinate
 
         directions = [(-1, 0), (1, 0), (0, 1), (0, -1)]
@@ -185,10 +204,8 @@ class Adventurer:
         other_adventurer.water += 1
     
     def clear_sand(self, tile_to_clear):
-        if tile_to_clear in self.available_tiles:
+        if tile_to_clear in self.available_sand:
             tile_to_clear.remove_sand()
-
-
 
 
 class Archeologist(Adventurer):
@@ -196,7 +213,7 @@ class Archeologist(Adventurer):
         super().__init__(name, symbol, tile, water, coordinate_to_tile)
 
     def ability(self, tile_to_clear):
-        if tile_to_clear in self.available_tiles:
+        if tile_to_clear in self.available_sand:
             tile_to_clear.remove_sand()
             tile_to_clear.remove_sand()
 
@@ -215,6 +232,20 @@ class Meteorologist(Adventurer):
 class Navigator(Adventurer):
     def __init__(self, name, symbol, tile, water, coordinate_to_tile):
         super().__init__(name, symbol, tile, water, coordinate_to_tile)
+    
+    def ability(self, other_adventurer, move):
+        x_move, y_move = move
+
+        new_x = other_adventurer.tile.x_coordinate + x_move
+        new_y = other_adventurer.tile.y_coordinate + y_move
+
+        if (0 <= new_x <= 4 and 0 <= new_y <= 4) and not self.coordinate_to_tile[(new_x, new_y)].blocked:
+
+            other_adventurer.tile.remove_adventurer(other_adventurer)
+            other_adventurer.tile = self.coordinate_to_tile[(new_x, new_y)]
+            other_adventurer.tile.add_adventurer(other_adventurer)
+        else:
+            raise ValueError("Invalid move for Navigator's ability.")
 
 class WaterCarrier(Adventurer):
     def __init__(self, name, symbol, tile, water, coordinate_to_tile):
@@ -224,6 +255,7 @@ class WaterCarrier(Adventurer):
         if self.tile.flipped == True and "water" in self.tile.name and self.tile.blocked == False:
             self.get_water()
             self.get_water()
+
 
 class Deck:
     def __init__(self):
