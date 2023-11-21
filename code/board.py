@@ -269,9 +269,10 @@ class WaterCarrier(Adventurer):
 
 class Deck:
     def __init__(self):
-        self.deck = self.initialize_deck()
+        self.deck = self.create()
+        self.discard_pile = []
 
-    def initialize_deck(self):
+    def create(self):
         # create deck of cards
         deck = []
 
@@ -280,27 +281,37 @@ class Deck:
         # 1 move cards
         for pattern in storm_patterns:
             for i in range(3):
-                deck.append(StormCard(f"Storm Moves {i}", [pattern]))
+                deck.append(StormCard(f"Storm Moves x1 {i+1}/3", [pattern]))
 
         # 2 move cards
         for pattern in storm_patterns:
             for i in range(2):
-                deck.append(StormCard(f"Storm Moves {i}", [pattern, pattern]))
+                deck.append(StormCard(f"Storm Moves x2 {i+1}/2", [pattern, pattern]))
 
         # 3 move cards
         for pattern in storm_patterns:
             for i in range(1):
-                deck.append(StormCard(f"Storm Moves {i}", [pattern, pattern, pattern]))
+                deck.append(StormCard(f"Storm Moves x3 {i+1}/1", [pattern, pattern, pattern]))
 
         # add sun betas down cards
         for i in range(4):
-            deck.append(SBDCard(f"Sun Beats Down {i}"))
+            deck.append(SBDCard(f"Sun Beats Down {i+1}/4"))
 
         # add storm picks up cards
         for i in range(3):
-            deck.append(SPUCard(f"Storm Picks Up {i}"))
+            deck.append(SPUCard(f"Storm Picks Up {i+1}/3"))
 
         return deck
+    
+    def shuffle(self):
+        random.shuffle(self.deck)
+
+    def draw(self, amount):
+        return self.deck.pop()
+
+
+    def __str__(self):
+        return '\n'.join(str(card) for card in self.deck)
 
 
 class StormCard:
@@ -323,6 +334,8 @@ class StormCard:
 
                 storm.swap(adjacent_tile, coordinate_to_tile)
 
+    def __str__(self):
+        return self.name
 
 class SBDCard:
     def __init__(self, name):
@@ -334,10 +347,15 @@ class SBDCard:
                 for adventurer in tile.adventurers:
                     adventurer.lose_water()
 
+    def __str__(self):
+       return self.name
+
 
 class SPUCard:
     def __init__(self, name):
         self.name = name
+    def __str__(self):
+        return self.name
 
 
 def initialize_tiles(coordinate_to_tile):
@@ -476,6 +494,10 @@ def main():
     tiles = initialize_tiles(coordinate_to_tile)
     coordinate_to_tile = set_tile_coordinates(tiles)
     adventurers = initialize_adventurers(tiles, coordinate_to_tile)
+
+    deck = Deck()
+    deck.shuffle()
+    print(deck)
 
     # Example usage
     storm_tile = tiles["storm"]  # Assuming tiles is already initialized
