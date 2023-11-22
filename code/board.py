@@ -293,7 +293,7 @@ class Deck:
             for i in range(1):
                 deck.append(StormCard(f"Storm Moves x3 {i+1}/1", [pattern, pattern, pattern]))
 
-        # add sun betas down cards
+        # add sun beats down cards
         for i in range(4):
             deck.append(SBDCard(f"Sun Beats Down {i+1}/4"))
 
@@ -306,9 +306,30 @@ class Deck:
     def shuffle(self):
         random.shuffle(self.deck)
 
-    def draw(self, amount):
-        return self.deck.pop()
+    def reshuffle(self):
+        self.deck = self.discard_pile
+        self.discard_pile = []
 
+        self.shuffle()
+
+    def draw(self, amount, storm=None, tiles=None, coordinate_to_tile=None):
+        drawn_cards = []
+        for _ in range(amount):
+            if not self.deck:  # Check if the deck is empty. If it is, reshuffle.
+                self.reshuffle()
+
+            card = self.deck.pop()
+            self.discard_pile.append(card)
+            drawn_cards.append(card)
+
+            # Apply the effect of the drawn card
+            if isinstance(card, StormCard):
+                card.apply(storm, coordinate_to_tile)
+            elif isinstance(card, SBDCard):
+                card.apply(tiles)
+            # Add similar conditions for other card types if needed
+
+        return drawn_cards  # Return a list of drawn cards
 
     def __str__(self):
         return '\n'.join(str(card) for card in self.deck)
