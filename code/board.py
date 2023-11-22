@@ -342,7 +342,8 @@ class Deck:
 
     def draw(self, storm=None, tiles=None, coordinate_to_tile=None):
         drawn_cards = []
-        amount = self.amount_to_draw()
+        self.amount_to_draw()
+        amount = self.amount
         for _ in range(amount):
             if not self.deck:  # Check if the deck is empty. If it is, reshuffle.
                 self.reshuffle()
@@ -351,6 +352,7 @@ class Deck:
             self.discard_pile.append(card)
             drawn_cards.append(card)
 
+            print(card)
             # Apply the effect of the drawn card
             if isinstance(card, StormCard):
                 card.apply(storm, coordinate_to_tile)
@@ -386,7 +388,7 @@ class StormCard:
                 storm.swap(adjacent_tile, coordinate_to_tile)
 
     def __str__(self):
-        return self.name
+        return f"{self.name}, {self.moves}"
 
 class SBDCard:
     def __init__(self, name):
@@ -548,24 +550,14 @@ def main():
 
     deck = Deck()
     deck.shuffle()
+    storm_tile = tiles["storm"]  # Assuming tiles is already initialized
+    deck.draw(storm_tile, tiles, coordinate_to_tile)
+
+    print_board(tiles)
+    print_adventurers(adventurers)
+
     print(deck)
 
-    # Example usage
-    storm_tile = tiles["storm"]  # Assuming tiles is already initialized
-    storm_card = StormCard("Storm Moves", [(1, 0), (1, 0)])  # Example for "two right"
-
-    # To apply the storm card
-    storm_card.apply(storm_tile, coordinate_to_tile)
-
-    print_board(tiles)
-    print_adventurers(adventurers)
-
-    adventurers["archeologist"].move((0, 1))
-    SBD_card = SBDCard("Sun Beats down")
-    SBD_card.apply(tiles)
-
-    print_board(tiles)
-    print_adventurers(adventurers)
 
 
 if __name__ == "__main__":
