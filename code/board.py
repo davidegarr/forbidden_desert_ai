@@ -271,6 +271,10 @@ class Deck:
     def __init__(self):
         self.deck = self.create()
         self.discard_pile = []
+        self.amount = 0
+        #self.sand_storm_level is the storm meter in the boardgame
+        self.sand_storm_level = 1 
+
 
     def create(self):
         # create deck of cards
@@ -303,6 +307,30 @@ class Deck:
 
         return deck
     
+    def increase_storm_level(self):
+        """"
+        Increase the sandstorm level by one. This determines the amount of cards drawn each turn.
+        """
+        self.sand_storm_level += 1
+
+    def amount_to_draw(self):
+        """
+        Determine the amount of cards to draw according to the storm level.
+        Implemented for 5 players.
+        """
+        if self.sand_storm_level <= 1:
+            self.amount = 2
+        elif 2 <= self.sand_storm_level <= 6:
+            self.amount = 3
+        elif 7 <= self.sand_storm_level <= 10:
+            self.amount = 4
+        elif 11 <= self.sand_storm_level <= 13:
+            self.amount = 5
+        elif 14 <= self.sand_storm_level <= 15:
+            self.amount = 6
+        elif self.sand_storm_level > 15:
+            raise ValueError("Game Over. Sand storm became too strong.")
+    
     def shuffle(self):
         random.shuffle(self.deck)
 
@@ -312,8 +340,9 @@ class Deck:
 
         self.shuffle()
 
-    def draw(self, amount, storm=None, tiles=None, coordinate_to_tile=None):
+    def draw(self, storm=None, tiles=None, coordinate_to_tile=None):
         drawn_cards = []
+        amount = self.amount_to_draw()
         for _ in range(amount):
             if not self.deck:  # Check if the deck is empty. If it is, reshuffle.
                 self.reshuffle()
@@ -327,7 +356,8 @@ class Deck:
                 card.apply(storm, coordinate_to_tile)
             elif isinstance(card, SBDCard):
                 card.apply(tiles)
-            # Add similar conditions for other card types if needed
+            elif isinstance(card, SPUCard):
+                self.increase_storm_level()
 
         return drawn_cards  # Return a list of drawn cards
 
