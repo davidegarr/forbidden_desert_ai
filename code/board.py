@@ -495,6 +495,74 @@ class GearDeck:
         card = self.gear_deck.pop()
         adventurer.get_item(card)
 
+class DuneBlaster:
+    def __init__(self, name):
+        self.name = name
+    
+    def __str__(self):
+        return self.name
+    
+    def apply(self, tile):
+        tile.sand = 0
+        tile.blocked = False
+        print("All sand was cleared!")
+
+
+class JetPack:
+    def __init__(self, name):
+        self.name = name
+    
+    def __str__(self):
+        return self.name
+    
+    def apply(self, adventurer, move):
+        adventurer.move(move)
+
+class Terrascope:
+    def __init__(self, name):
+        self.name = name
+    
+    def __str__(self):
+        return self.name
+    
+    def apply(self, tile):
+        return tile.name
+
+class SolarShield:
+    def __init__(self, name):
+        self.name = name
+
+    def __str__(self):
+        return self.name
+
+    def apply(self):
+        pass #TBD
+
+class TimeThrottle:
+    def __init__(self, name):
+        self.name = name
+    
+    def __str__(self):
+        return self.name
+    
+    def apply(self):
+        pass #TBD
+
+class SecretWaterReserve:
+    def __init__(self, name):
+        self.name = name
+    
+    def __str__(self):
+        return self.name
+
+    def apply(self, adventurer):
+        print(f"{adventurer.name} uses {self.name} on {adventurer.tile.name}.")
+        for adventurer in adventurer.tile.adventurers:
+            adventurer.get_water()
+            adventurer.get_water()
+            print(f"{adventurer.name} now has {adventurer.water} units of water.")
+
+        
 
 def initialize_tiles(coordinate_to_tile):
     """
