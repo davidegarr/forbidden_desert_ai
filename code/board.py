@@ -56,6 +56,11 @@ class Tile:
 
     def flip(self):
         self.flipped = True
+        self.apply_flip_effect()
+    
+    def apply_flip_effect(self):
+        #Described in each tile sublass - vide infra.
+        print("Placeholder")    
 
     def set_coordinates(self, x_coordinate, y_coordinate):
         self.x_coordinate = x_coordinate
@@ -89,6 +94,23 @@ class Tile:
         if self.sand < 2:
             self.blocked = False
 
+
+class WaterTile(Tile):
+    def __init__(self, name, symbol, coordinate_to_tile, x_coordinate=None, y_coordinate=None):
+        super().__init__(name, symbol, coordinate_to_tile, x_coordinate, y_coordinate)
+    
+    def apply_flip_effect(self):
+        for adventurer in self.adventurers:
+            adventurer.get_water()
+            adventurer.get_water()
+
+
+class MirageTile(Tile):
+    def __init__(self, name, symbol, coordinate_to_tile, x_coordinate=None, y_coordinate=None):
+        super().__init__(name, symbol, coordinate_to_tile, x_coordinate, y_coordinate)
+    
+    def apply_flip_effect(self):
+        print("The well is dry...")
 
 class Adventurer:
     """
@@ -433,9 +455,9 @@ def initialize_tiles(coordinate_to_tile):
         "compass_v": Tile("compass_v", "Cv", coordinate_to_tile),
         "propeller_h": Tile("propeller_h", "Ph", coordinate_to_tile),
         "propeller_v": Tile("propeller_v", "Pv", coordinate_to_tile),
-        "water_1": Tile("water_1", "W1", coordinate_to_tile),
-        "water_2": Tile("water_2", "W2", coordinate_to_tile),
-        "oasis": Tile("oasis", "O", coordinate_to_tile),
+        "water_1": WaterTile("water_1", "W1", coordinate_to_tile),
+        "water_2": WaterTile("water_2", "W2", coordinate_to_tile),
+        "oasis": MirageTile("mirage", "M", coordinate_to_tile),
         "dune_1": Tile("dune_1", "D1", coordinate_to_tile),
         "dune_2": Tile("dune_2", "D2", coordinate_to_tile),
         "dune_3": Tile("dune_3", "D3", coordinate_to_tile),
@@ -556,7 +578,7 @@ def main():
     print_board(tiles)
     print_adventurers(adventurers)
 
-    print(deck)
+    #print(deck)
 
 
 
