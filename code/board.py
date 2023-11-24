@@ -57,10 +57,10 @@ class Tile:
     def flip(self):
         self.flipped = True
         self.apply_flip_effect()
-    
+
     def apply_flip_effect(self):
-        #Described in each tile sublass - vide infra.
-        print("Placeholder")    
+        # Described in each tile sublass - vide infra.
+        print("Placeholder")
 
     def set_coordinates(self, x_coordinate, y_coordinate):
         self.x_coordinate = x_coordinate
@@ -96,9 +96,11 @@ class Tile:
 
 
 class WaterTile(Tile):
-    def __init__(self, name, symbol, coordinate_to_tile, x_coordinate=None, y_coordinate=None):
+    def __init__(
+        self, name, symbol, coordinate_to_tile, x_coordinate=None, y_coordinate=None
+    ):
         super().__init__(name, symbol, coordinate_to_tile, x_coordinate, y_coordinate)
-    
+
     def apply_flip_effect(self):
         for adventurer in self.adventurers:
             adventurer.get_water()
@@ -106,9 +108,11 @@ class WaterTile(Tile):
 
 
 class MirageTile(Tile):
-    def __init__(self, name, symbol, coordinate_to_tile, x_coordinate=None, y_coordinate=None):
+    def __init__(
+        self, name, symbol, coordinate_to_tile, x_coordinate=None, y_coordinate=None
+    ):
         super().__init__(name, symbol, coordinate_to_tile, x_coordinate, y_coordinate)
-    
+
     def apply_flip_effect(self):
         print("The well is dry...")
 
@@ -240,6 +244,7 @@ class Adventurer:
     def use_item(self, item):
         pass
 
+
 class Archeologist(Adventurer):
     def __init__(self, name, symbol, tile, water, coordinate_to_tile):
         super().__init__(name, symbol, tile, water, coordinate_to_tile)
@@ -304,9 +309,8 @@ class Deck:
         self.deck = self.create()
         self.discard_pile = []
         self.amount = 0
-        #self.sand_storm_level is the storm meter in the boardgame
-        self.sand_storm_level = 1 
-
+        # self.sand_storm_level is the storm meter in the boardgame
+        self.sand_storm_level = 1
 
     def create(self):
         # create deck of cards
@@ -327,7 +331,9 @@ class Deck:
         # 3 move cards
         for pattern in storm_patterns:
             for i in range(1):
-                deck.append(StormCard(f"Storm Moves x3 {i+1}/1", [pattern, pattern, pattern]))
+                deck.append(
+                    StormCard(f"Storm Moves x3 {i+1}/1", [pattern, pattern, pattern])
+                )
 
         # add sun beats down cards
         for i in range(4):
@@ -338,9 +344,9 @@ class Deck:
             deck.append(SPUCard(f"Storm Picks Up {i+1}/3"))
 
         return deck
-    
+
     def increase_storm_level(self):
-        """"
+        """ "
         Increase the sandstorm level by one. This determines the amount of cards drawn each turn.
         """
         self.sand_storm_level += 1
@@ -362,7 +368,7 @@ class Deck:
             self.amount = 6
         elif self.sand_storm_level > 15:
             raise ValueError("Game Over. Sand storm became too strong.")
-    
+
     def shuffle(self):
         random.shuffle(self.deck)
 
@@ -396,53 +402,7 @@ class Deck:
         return drawn_cards  # Return a list of drawn cards
 
     def __str__(self):
-        return '\n'.join(str(card) for card in self.deck)
-
-
-class GearDeck:
-    def __init__(self):
-        self.gear_deck = self.create()
-    
-    def create(self):
-        # create deck of gear_cards
-        gear_deck = []
-
-        # 3 DuneBlaster
-        for i in range(3):
-            gear_deck.append(DuneBlaster(f"Dune Blaster {i+1}/3"))
-        
-        # 3 JetPack
-        for i in range(3):
-            gear_deck.append(JetPack(f"Jet Pack {i+1}/3"))
-        
-        # 2 Terrascope
-        for i in range(2):
-            gear_deck.append(Terrascope(f"Terrascope {i+1}/2"))
-
-        # 2 SolarShield
-        for i in range(2):
-            gear_deck.append(SolarShield(f"Solar Shield {i+1}/2"))
-
-        # 1 TimeThrottle
-        for i in range(1):
-            gear_deck.append(TimeThrottle(f"Time Throttle {i+1}/1"))
-
-        # 1 SecretWaterReserve
-        for i in range(1):
-            gear_deck.append(SecretWaterReserve(f"Secret Water Reserve {i+1}/1"))
-
-        return gear_deck
-
-    def shuffle(self):
-        random.shuffle(self.gear_deck)
-    
-    def draw(self, adventurer):
-        if not self.gear_deck:
-            return None
-        
-        card = self.gear_deck.pop()
-        adventurer.get_item(card)
-        
+        return "\n".join(str(card) for card in self.deck)
 
 
 class StormCard:
@@ -480,14 +440,60 @@ class SBDCard:
                     adventurer.lose_water()
 
     def __str__(self):
-       return self.name
+        return self.name
 
 
 class SPUCard:
     def __init__(self, name):
         self.name = name
+
     def __str__(self):
         return self.name
+
+
+class GearDeck:
+    def __init__(self):
+        self.gear_deck = self.create()
+
+    def create(self):
+        # create deck of gear_cards
+        gear_deck = []
+
+        # 3 DuneBlaster
+        for i in range(3):
+            gear_deck.append(DuneBlaster(f"Dune Blaster {i+1}/3"))
+
+        # 3 JetPack
+        for i in range(3):
+            gear_deck.append(JetPack(f"Jet Pack {i+1}/3"))
+
+        # 2 Terrascope
+        for i in range(2):
+            gear_deck.append(Terrascope(f"Terrascope {i+1}/2"))
+
+        # 2 SolarShield
+        for i in range(2):
+            gear_deck.append(SolarShield(f"Solar Shield {i+1}/2"))
+
+        # 1 TimeThrottle
+        for i in range(1):
+            gear_deck.append(TimeThrottle(f"Time Throttle {i+1}/1"))
+
+        # 1 SecretWaterReserve
+        for i in range(1):
+            gear_deck.append(SecretWaterReserve(f"Secret Water Reserve {i+1}/1"))
+
+        return gear_deck
+
+    def shuffle(self):
+        random.shuffle(self.gear_deck)
+
+    def draw(self, adventurer):
+        if not self.gear_deck:
+            return None
+
+        card = self.gear_deck.pop()
+        adventurer.get_item(card)
 
 
 def initialize_tiles(coordinate_to_tile):
@@ -635,8 +641,7 @@ def main():
     print_board(tiles)
     print_adventurers(adventurers)
 
-    #print(deck)
-
+    # print(deck)
 
 
 if __name__ == "__main__":
