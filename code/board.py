@@ -112,6 +112,7 @@ class MirageTile(Tile):
     def apply_flip_effect(self):
         print("The well is dry...")
 
+
 class Adventurer:
     """
     The Adventurer class represents a player in the Forbidden Desert game.
@@ -136,6 +137,7 @@ class Adventurer:
         self.coordinate_to_tile = coordinate_to_tile
         self.water = water
         self.max_water = water
+        self.inventory = []
 
     def available_sand(self):
         accessible_tiles = [self.tile]
@@ -229,6 +231,14 @@ class Adventurer:
         if tile_to_clear in self.available_sand:
             tile_to_clear.remove_sand()
 
+    def get_item(self, gear_card):
+        self.inventory.append(gear_card)
+
+    def available_items(self):
+        return self.inventory
+
+    def use_item(self, item):
+        pass
 
 class Archeologist(Adventurer):
     def __init__(self, name, symbol, tile, water, coordinate_to_tile):
@@ -389,6 +399,52 @@ class Deck:
         return '\n'.join(str(card) for card in self.deck)
 
 
+class GearDeck:
+    def __init__(self):
+        self.gear_deck = self.create()
+    
+    def create(self):
+        # create deck of gear_cards
+        gear_deck = []
+
+        # 3 DuneBlaster
+        for i in range(3):
+            gear_deck.append(DuneBlaster(f"Dune Blaster {i+1}/3"))
+        
+        # 3 JetPack
+        for i in range(3):
+            gear_deck.append(JetPack(f"Jet Pack {i+1}/3"))
+        
+        # 2 Terrascope
+        for i in range(2):
+            gear_deck.append(Terrascope(f"Terrascope {i+1}/2"))
+
+        # 2 SolarShield
+        for i in range(2):
+            gear_deck.append(SolarShield(f"Solar Shield {i+1}/2"))
+
+        # 1 TimeThrottle
+        for i in range(1):
+            gear_deck.append(TimeThrottle(f"Time Throttle {i+1}/1"))
+
+        # 1 SecretWaterReserve
+        for i in range(1):
+            gear_deck.append(SecretWaterReserve(f"Secret Water Reserve {i+1}/1"))
+
+        return gear_deck
+
+    def shuffle(self):
+        random.shuffle(self.gear_deck)
+    
+    def draw(self, adventurer):
+        if not self.gear_deck:
+            return None
+        
+        card = self.gear_deck.pop()
+        adventurer.get_item(card)
+        
+
+
 class StormCard:
     def __init__(self, name, moves):
         self.name = name
@@ -411,6 +467,7 @@ class StormCard:
 
     def __str__(self):
         return f"{self.name}, {self.moves}"
+
 
 class SBDCard:
     def __init__(self, name):
