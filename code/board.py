@@ -54,13 +54,14 @@ class Tile:
     def set_coordinate_mapping(self, coordinate_to_tile):
         self.coordinate_to_tile = coordinate_to_tile
 
-    def flip(self):
+    def flip(self, adventurer):
+        print(f"{adventurer.name} has flipped tile {self.name}")
         self.flipped = True
-        self.apply_flip_effect()
+        self.apply_flip_effect(adventurer)
 
     def apply_flip_effect(self):
         # Described in each tile sublass - vide infra.
-        print("Placeholder")
+        pass
 
     def set_coordinates(self, x_coordinate, y_coordinate):
         self.x_coordinate = x_coordinate
@@ -101,7 +102,8 @@ class WaterTile(Tile):
     ):
         super().__init__(name, symbol, coordinate_to_tile, x_coordinate, y_coordinate)
 
-    def apply_flip_effect(self):
+    def apply_flip_effect(self, adventurer):
+        #adventurer is actually not needed TBD
         for adventurer in self.adventurers:
             adventurer.get_water()
             adventurer.get_water()
@@ -113,8 +115,18 @@ class MirageTile(Tile):
     ):
         super().__init__(name, symbol, coordinate_to_tile, x_coordinate, y_coordinate)
 
-    def apply_flip_effect(self):
+    def apply_flip_effect(self, adventurer):
+        #adventurer is actually not needed TBD
         print("The well is dry...")
+
+class GearTile(Tile):
+    def __init__(
+        self, name, symbol, coordinate_to_tile, x_coordinate=None, y_coordinate=None
+    ):
+        super().__init__(name, symbol, coordinate_to_tile, x_coordinate, y_coordinate)
+
+    def apply_flip_effect(self, adventurer):
+        pass
 
 
 class Adventurer:
@@ -143,6 +155,15 @@ class Adventurer:
         self.max_water = water
         self.inventory = []
 
+        
+    def __str__(self):
+        return (
+            f"{self.name} ({self.symbol}) at {self.tile.name}. {self.water} water left. Inventory: {self.inventory}"
+        )
+    
+    def flip(self):
+        self.tile.flip(self)
+
     def available_sand(self):
         accessible_tiles = [self.tile]
         current_x, current_y = self.tile.x_coordinate, self.tile.y_coordinate
@@ -163,7 +184,7 @@ class Adventurer:
         return accessible_tiles
 
     def available_moves(self):
-        accessible_tiles = []
+        valid_moves = []
         current_x, current_y = self.tile.x_coordinate, self.tile.y_coordinate
 
         directions = [(-1, 0), (1, 0), (0, 1), (0, -1)]
@@ -171,46 +192,30 @@ class Adventurer:
         for dx, dy in directions:
             new_x, new_y = current_x + dx, current_y + dy
 
-            # Check if the new coordinates are within the board boundaries
+            # Check if the new coordinates are within board boundaries and not a storm tile
             if 0 <= new_x <= 4 and 0 <= new_y <= 4:
                 adjacent_tile = self.coordinate_to_tile.get((new_x, new_y))
 
-                # Check if the adjacent tile is not the storm tile
-                if adjacent_tile and adjacent_tile.name != "storm":
-                    accessible_tiles.append(adjacent_tile)
+                if adjacent_tile and adjacent_tile.name != "storm" and not adjacent_tile.blocked:
+                    valid_moves.append((dx, dy))
 
-        return accessible_tiles
+        return valid_moves
 
-    def __str__(self):
-        return (
-            f"{self.name} ({self.symbol}) at {self.tile.name}. {self.water} water left."
-        )
 
-    def move(self, move):
-        x_move, y_move = move
-        current_x, current_y = self.tile.x_coordinate, self.tile.y_coordinate
+    def move(self, move_direction, coordinate_to_tile):
+        if move_direction in self.available_moves():
+            dx, dy = move_direction
+            current_x, current_y = self.tile.x_coordinate, self.tile.y_coordinate
 
-        new_x, new_y = current_x + x_move, current_y + y_move
-        if not (0 <= new_x <= 4) or not (0 <= new_y <= 4):
-            new_x = current_x
-            new_y = current_y
-            raise ValueError("Movement not valid. Move outside borders.")
+            new_x, new_y = current_x + dx, current_y + dy
+            new_tile = coordinate_to_tile[(new_x, new_y)]
 
-        if self.coordinate_to_tile[(new_x, new_y)].name == "storm":
-            new_x = current_x
-            new_y = current_y
-            raise ValueError("Movement not valid. You can not run into the storm.")
-
-        if self.coordinate_to_tile[(new_x, new_y)].blocked == True:
-            new_x = current_x
-            new_y = current_y
-            raise ValueError("Movement not valid. Destination tile is blocked.")
-
-        self.tile.remove_adventurer(self)
-
-        self.tile = self.coordinate_to_tile[(new_x, new_y)]
-
-        self.tile.add_adventurer(self)
+            # Update the current tile and the adventurer's position
+            self.tile.remove_adventurer(self)
+            new_tile.add_adventurer(self)
+            self.tile = new_tile
+        else:
+            raise ValueError("Invalid move.")
 
     def get_water(self):
         self.water += 1
@@ -744,6 +749,9 @@ def main():
     deck.shuffle()
     storm_tile = tiles["storm"]  # Assuming tiles is already initialized
     deck.draw(storm_tile, tiles, coordinate_to_tile)
+    adventurers["archeologist"].move((0,1), coordinate_to_tile)
+    adventurers["archeologist"].flip()
+    adventurers["explorer"].flip()
 
     print_board(tiles)
     print_adventurers(adventurers)
