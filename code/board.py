@@ -263,6 +263,47 @@ class Climber(Adventurer):
 class Explorer(Adventurer):
     def __init__(self, name, symbol, tile, water, coordinate_to_tile):
         super().__init__(name, symbol, tile, water, coordinate_to_tile)
+    
+
+    def available_moves(self):
+        accessible_tiles = []
+        current_x, current_y = self.tile.x_coordinate, self.tile.y_coordinate
+
+        # Explorer can move diagonally
+        directions = [(-1, 0), (1, 0), (0, 1), (0, -1), (1, 1), (1, -1), (-1, 1), (-1, -1)]
+
+        for dx, dy in directions:
+            new_x, new_y = current_x + dx, current_y + dy
+
+            # Check if the new coordinates are within the board boundaries
+            if 0 <= new_x <= 4 and 0 <= new_y <= 4:
+                adjacent_tile = self.coordinate_to_tile.get((new_x, new_y))
+
+                # Check if the adjacent tile is not the storm tile
+                if adjacent_tile and adjacent_tile.name != "storm":
+                    accessible_tiles.append(adjacent_tile)
+
+        return accessible_tiles
+    
+    def available_sand(self):
+        accessible_tiles = [self.tile]
+        current_x, current_y = self.tile.x_coordinate, self.tile.y_coordinate
+
+        # Climber can remove sand diagonally (including duneblaser.)
+        directions = [(-1, 0), (1, 0), (0, 1), (0, -1), (1, 1), (1, -1), (-1, 1), (-1, -1)]
+
+        for dx, dy in directions:
+            new_x, new_y = current_x + dx, current_y + dy
+
+            # Check if the new coordinates are within the board boundaries
+            if 0 <= new_x <= 4 and 0 <= new_y <= 4:
+                adjacent_tile = self.coordinate_to_tile.get((new_x, new_y))
+
+                # Check if the adjacent tile is not the storm tile
+                if adjacent_tile and adjacent_tile.name != "storm":
+                    accessible_tiles.append(adjacent_tile)
+
+        return accessible_tiles
 
 
 class Meteorologist(Adventurer):
@@ -507,7 +548,6 @@ class DuneBlaster:
         tile.blocked = False
         print("All sand was cleared!")
 
-
 class JetPack:
     def __init__(self, name):
         self.name = name
@@ -562,8 +602,7 @@ class SecretWaterReserve:
             adventurer.get_water()
             print(f"{adventurer.name} now has {adventurer.water} units of water.")
 
-        
-
+    
 def initialize_tiles(coordinate_to_tile):
     """
     The tiles dictionary is the equivalent of the stack of tiles that comes with the boardgame.
