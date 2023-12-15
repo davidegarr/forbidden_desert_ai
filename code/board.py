@@ -59,7 +59,7 @@ class Tile:
         self.flipped = True
         self.apply_flip_effect(adventurer)
 
-    def apply_flip_effect(self):
+    def apply_flip_effect(self, adventurer):
         # Described in each tile sublass - vide infra.
         pass
 
@@ -118,6 +118,7 @@ class MirageTile(Tile):
     def apply_flip_effect(self, adventurer):
         #adventurer is actually not needed TBD
         print("The well is dry...")
+
 
 class GearTile(Tile):
     def __init__(
