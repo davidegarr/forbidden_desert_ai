@@ -4,6 +4,7 @@ class Game:
     def __init__(self) -> None:
         #Initialize game state
         self.coordinate_to_tile = {} # Holds the mapping from coordinates to tiles
+        self.tiles = {} # Dictionary to store tiles by name
         self.adventurers = {} # Holds the adventurers by name
         self.deck = Deck() # Creates the deck of cards
         self.is_game_over = False # Status flag to control the game loop
@@ -50,6 +51,8 @@ class Game:
             "dune_8": GearTile("dune_8", "D8", self),
         }
 
+        self.tiles = tiles
+
         """
         Below, coordinates to the tiles are assigned and returns the coordinate_to_tile mapping.
         Only the "storm" tile is placed at a particular place (middle of the board: 2,2), the rest are placed at random.
@@ -80,27 +83,48 @@ class Game:
         for x_sand_tile, y_sand_tile in initial_sand:
             self.coordinate_to_tile[(x_sand_tile, y_sand_tile)].add_sand()
 
+
     def initialize_adventurers(self):
         """
         Here the adventurers dictionary is initialized, after the board is set.
         By default, all adventureres go to the "start" Tile.
-        """
-
-        start_tile = self.coordinate_to_tile.get("start")  # Get the start tile from the game's tile mapping
+        """ 
 
         self.adventurers = {
-            "archeologist": Archeologist("archeologist", "A", start_tile, self, 3),
-            "climber": Climber("climber", "C", start_tile, self, 3),
-            "explorer": Explorer("explorer", "E", start_tile, self, 4),
-            "meteorologist": Meteorologist("meteorologist", "M", start_tile, self, 4),
-            "navigator": Navigator("navigator", "N", start_tile, self, 4),
-            "water_carrier": WaterCarrier("water_carrier", "WC", start_tile, self, 5),
+            "archeologist": Archeologist("archeologist", "A", self.tiles["start"], self, 3),
+            "climber": Climber("climber", "C", self.tiles["start"], self, 3),
+            "explorer": Explorer("explorer", "E", self.tiles["start"], self, 4),
+            "meteorologist": Meteorologist("meteorologist", "M", self.tiles["start"], self, 4),
+            "navigator": Navigator("navigator", "N", self.tiles["start"], self, 4),
+            "water_carrier": WaterCarrier("water_carrier", "WC", self.tiles["start"], self, 5),
         }
 
         # Add the adventurers to the start tile
         for adventurer in self.adventurers.values():
-            start_tile.add_adventurer(adventurer)
+            self.tiles["start"].add_adventurer(adventurer)
 
+    def print_board(self):
+        board_representation = [["" for _ in range(5)] for _ in range(5)]
+
+        for _, tile in self.coordinate_to_tile.items():
+            x, y = tile.x_coordinate, tile.y_coordinate
+            symbol = tile.symbol
+            sand = f"({tile.sand})" if tile.sand > 0 else " "
+            board_representation[y][x] = f"{symbol:<2}{sand:<3}"
+
+        for row in board_representation:
+            print(" | ".join(cell for cell in row))
+            print("-" * (6 * 5 + 4 * 4))
+    
+    def print_adventurers(self):
+        for adventurer in self.adventurers.values():
+            print(adventurer)
+    
+    def print_game(self):
+        print("Game Board:")
+        self.print_board()
+        print("\nAdventurers:")
+        self.print_adventurers()
 
 class Tile:
     """
@@ -714,54 +738,9 @@ class SecretWaterReserve:
             print(f"{adventurer.name} now has {adventurer.water} units of water.")
 
 
-def print_board(tiles):
-    """
-    Self-explanatory. This function prints the board to the terminal. It formats the board so its easier to read (same size for each tile, etc).
-    It includes the symbol for the tile, and the amount of sand that it holds, if any.
-    """
-    board_representation = [["" for _ in range(5)] for _ in range(5)]
-
-    # Place tiles on the board
-    for tile_name, tile in tiles.items():
-        x, y = tile.x_coordinate, tile.y_coordinate
-        symbol = tile.symbol
-        sand = f"({tile.sand})" if tile.sand > 0 else " "
-
-        # Format each cell to have a fixed width for alignment
-        board_representation[y][x] = f"{symbol:<2}{sand:<3}"
-
-    # Print the board
-    for row in board_representation:
-        print(" | ".join(cell for cell in row))
-        print("-" * (6 * 5 + 4 * 4))  # Adjust the separator length to the cell width
-
-
-def print_adventurers(adventurers):
-    """
-    Self explanatory. Prints each adventurer using the __str__ method in the class to the terminal.
-    """
-    for adventurer in adventurers:
-        print(adventurers[adventurer])
-
-
 def main():
-    coordinate_to_tile = {}
-    tiles = initialize_tiles(coordinate_to_tile)
-    coordinate_to_tile = set_tile_coordinates(tiles)
-    adventurers = initialize_adventurers(tiles, coordinate_to_tile)
-
-    deck = Deck()
-    deck.shuffle()
-    storm_tile = tiles["storm"]  # Assuming tiles is already initialized
-    deck.draw(storm_tile, tiles, coordinate_to_tile)
-    adventurers["archeologist"].move((0,1), coordinate_to_tile)
-    adventurers["archeologist"].flip()
-    adventurers["explorer"].flip()
-
-    print_board(tiles)
-    print_adventurers(adventurers)
-
-    # print(deck)
+    game = Game()
+    game.print_game()
 
 
 if __name__ == "__main__":
