@@ -1,5 +1,88 @@
 import random
 
+class Game:
+    def __init__(self) -> None:
+        #Initialize game state
+        self.coordinate_to_tile = {} # Holds the mapping from coordinates to tiles
+        self.adventurers = {} # Holds the adventurers by name
+        self.deck = Deck() # Creates the deck of cards
+        self.is_game_over = False # Status flag to control the game loop
+
+        self.setup() # Perform initial game setup
+    
+    def setup(self):
+        # Call methods to initialize the game components
+        self.initialize_tiles()
+        self.initialize_adventurers()
+
+    def initialize_tiles(self):
+        """
+        The tiles dictionary is the equivalent of the stack of tiles that comes with the boardgame.
+        The same quantity and type of tiles as within the "real" boardgame is depicted here.
+        Each key-value pair consists of a unique tile name and a corresponding Tile object that holds
+        the tile's properties such as its symbol, coordinates, and state (flipped or not, and the amount of sand).
+        """
+        tiles = {
+            "start": GearTile("start", "S", self),
+            "storm": Tile("storm", "X", self),
+            "tunnel_1": Tile("tunnel_1", "T1", self),
+            "tunnel_2": Tile("tunnel_2", "T2", self),
+            "tunnel_3": Tile("tunnel_3", "T3", self),
+            "boat": Tile("boat", "B", self),
+            "gem_h": Tile("gem_h", "Gh", self),
+            "gem_v": Tile("gem_v", "Gv", self),
+            "motor_h": Tile("motor_h", "Mh", self),
+            "motor_v": Tile("motor_v", "Mv", self),
+            "compass_h": Tile("compass_h", "Ch", self),
+            "compass_v": Tile("compass_v", "Cv", self),
+            "propeller_h": Tile("propeller_h", "Ph", self),
+            "propeller_v": Tile("propeller_v", "Pv", self),
+            "water_1": WaterTile("water_1", "W1", self),
+            "water_2": WaterTile("water_2", "W2", self),
+            "oasis": MirageTile("mirage", "M", self),
+            "dune_1": GearTile("dune_1", "D1", self),
+            "dune_2": GearTile("dune_2", "D2", self),
+            "dune_3": GearTile("dune_3", "D3", self),
+            "dune_4": GearTile("dune_4", "D4", self),
+            "dune_5": GearTile("dune_5", "D5", self),
+            "dune_6": GearTile("dune_6", "D6", self),
+            "dune_7": GearTile("dune_7", "D7", self),
+            "dune_8": GearTile("dune_8", "D8", self),
+        }
+
+        """
+        Below, coordinates to the tiles are assigned and returns the coordinate_to_tile mapping.
+        Only the "storm" tile is placed at a particular place (middle of the board: 2,2), the rest are placed at random.
+        Adds initial sand to board.
+        """
+        # Assign fixed coordinates to the storm tile
+        tiles["storm"].set_coordinates(2, 2)
+
+        # Create a list of all possible coordinates except for the storm's
+        all_coordinates = [(x, y) for x in range(5) for y in range(5)]
+        all_coordinates.remove((2, 2))  # Remove the storm's fixed coordinates
+        random.shuffle(all_coordinates)
+
+        # Initialize coordinate_to_tile with the storm tile
+        self.coordinate_to_tile = {(2, 2): tiles["storm"]}
+
+        # Assign coordinates to the rest of the tiles
+        for tile_name, tile in tiles.items():
+            if tile.x_coordinate is None and tile.y_coordinate is None:
+                x, y = all_coordinates.pop()
+                tile.set_coordinates(x, y)
+                self.coordinate_to_tile[(x, y)] = tile
+
+        for tile in tiles.values():
+            tile.set_coordinate_mapping(coordinate_to_tile)
+
+        """
+        Add initial sand using the .add_sand() method.
+        """
+        initial_sand = [(0, 2), (1, 1), (1, 3), (2, 0), (2, 4), (3, 1), (3, 3), (4, 2)]
+        for x_sand_tile, y_sand_tile in initial_sand:
+            self.coordinate_to_tile[(x_sand_tile, y_sand_tile)].add_sand()
+
 
 class Tile:
     """
@@ -24,7 +107,7 @@ class Tile:
         self,
         name,
         symbol,
-        coordinate_to_tile,
+        game,
         x_coordinate=None,
         y_coordinate=None,
         flipped=False,
@@ -32,12 +115,12 @@ class Tile:
     ):
         self.name = name
         self.symbol = symbol
+        self.game = game
         self.x_coordinate = x_coordinate
         self.y_coordinate = y_coordinate
         self.sand = 0
         self.flipped = flipped
         self.blocked = blocked
-        self.coordinate_to_tile = coordinate_to_tile
         self.adventurers = []  # List of adventurers on this tile
 
     def __str__(self):
@@ -50,9 +133,6 @@ class Tile:
 
     def remove_adventurer(self, adventurer):
         self.adventurers.remove(adventurer)
-
-    def set_coordinate_mapping(self, coordinate_to_tile):
-        self.coordinate_to_tile = coordinate_to_tile
 
     def flip(self, adventurer):
         print(f"{adventurer.name} has flipped tile {self.name}")
@@ -67,7 +147,7 @@ class Tile:
         self.x_coordinate = x_coordinate
         self.y_coordinate = y_coordinate
 
-    def swap(self, other_tile, coordinate_to_tile):
+    def swap(self, other_tile):
         # swap coordinates
         temp_x, temp_y = self.x_coordinate, self.y_coordinate
         self.x_coordinate, self.y_coordinate = (
@@ -77,8 +157,8 @@ class Tile:
         other_tile.x_coordinate, other_tile.y_coordinate = temp_x, temp_y
 
         # Update the shared mapping with new coordinates
-        coordinate_to_tile[(self.x_coordinate, self.y_coordinate)] = self
-        coordinate_to_tile[
+        self.game.coordinate_to_tile[(self.x_coordinate, self.y_coordinate)] = self
+        self.game.coordinate_to_tile[
             (other_tile.x_coordinate, other_tile.y_coordinate)
         ] = other_tile
 
@@ -127,7 +207,7 @@ class GearTile(Tile):
         super().__init__(name, symbol, coordinate_to_tile, x_coordinate, y_coordinate)
 
     def apply_flip_effect(self, adventurer):
-        pass
+        #draws a gear card
 
 
 class Adventurer:
@@ -617,7 +697,7 @@ def initialize_tiles(coordinate_to_tile):
     the tile's properties such as its symbol, coordinates, and state (flipped or not, and the amount of sand).
     """
     tiles = {
-        "start": Tile("start", "S", coordinate_to_tile),
+        "start": GearTile("start", "S", coordinate_to_tile),
         "storm": Tile("storm", "X", coordinate_to_tile),
         "tunnel_1": Tile("tunnel_1", "T1", coordinate_to_tile),
         "tunnel_2": Tile("tunnel_2", "T2", coordinate_to_tile),
@@ -634,14 +714,14 @@ def initialize_tiles(coordinate_to_tile):
         "water_1": WaterTile("water_1", "W1", coordinate_to_tile),
         "water_2": WaterTile("water_2", "W2", coordinate_to_tile),
         "oasis": MirageTile("mirage", "M", coordinate_to_tile),
-        "dune_1": Tile("dune_1", "D1", coordinate_to_tile),
-        "dune_2": Tile("dune_2", "D2", coordinate_to_tile),
-        "dune_3": Tile("dune_3", "D3", coordinate_to_tile),
-        "dune_4": Tile("dune_4", "D4", coordinate_to_tile),
-        "dune_5": Tile("dune_5", "D5", coordinate_to_tile),
-        "dune_6": Tile("dune_6", "D6", coordinate_to_tile),
-        "dune_7": Tile("dune_7", "D7", coordinate_to_tile),
-        "dune_8": Tile("dune_8", "D8", coordinate_to_tile),
+        "dune_1": GearTile("dune_1", "D1", coordinate_to_tile),
+        "dune_2": GearTile("dune_2", "D2", coordinate_to_tile),
+        "dune_3": GearTile("dune_3", "D3", coordinate_to_tile),
+        "dune_4": GearTile("dune_4", "D4", coordinate_to_tile),
+        "dune_5": GearTile("dune_5", "D5", coordinate_to_tile),
+        "dune_6": GearTile("dune_6", "D6", coordinate_to_tile),
+        "dune_7": GearTile("dune_7", "D7", coordinate_to_tile),
+        "dune_8": GearTile("dune_8", "D8", coordinate_to_tile),
     }
     return tiles
 
