@@ -6,7 +6,8 @@ class Game:
         self.coordinate_to_tile = {} # Holds the mapping from coordinates to tiles
         self.tiles = {} # Dictionary to store tiles by name
         self.adventurers = {} # Holds the adventurers by name
-        self.deck = Deck() # Creates the deck of cards
+        self.deck = Deck(self) # Creates the deck of cards
+        self.sand_storm_level = 1
         self.is_game_over = False # Status flag to control the game loop
 
         self.setup() # Perform initial game setup
@@ -83,7 +84,6 @@ class Game:
         for x_sand_tile, y_sand_tile in initial_sand:
             self.coordinate_to_tile[(x_sand_tile, y_sand_tile)].add_sand()
 
-
     def initialize_adventurers(self):
         """
         Here the adventurers dictionary is initialized, after the board is set.
@@ -102,6 +102,9 @@ class Game:
         # Add the adventurers to the start tile
         for adventurer in self.adventurers.values():
             self.tiles["start"].add_adventurer(adventurer)
+
+    def increase_storm_level(self):
+        self.sand_storm_level += 1
 
     def print_board(self):
         board_representation = [["" for _ in range(5)] for _ in range(5)]
@@ -125,6 +128,8 @@ class Game:
         self.print_board()
         print("\nAdventurers:")
         self.print_adventurers()
+        print("\nStorm Level:", self.sand_storm_level, "\n")
+
 
 
 class Tile:
@@ -326,11 +331,7 @@ class Adventurer:
 
         return valid_moves
 
-
     def move(self, move_direction):
-        print(move_direction)
-        for move in self.available_moves():
-            print("av_move:", move)
         if move_direction in self.available_moves():
             dx, dy = move_direction
             current_x, current_y = self.tile.x_coordinate, self.tile.y_coordinate
@@ -478,12 +479,12 @@ class WaterCarrier(Adventurer):
 
 
 class Deck:
-    def __init__(self):
+    def __init__(self, game):
+        self.game = game
         self.deck = self.create()
         self.discard_pile = []
-        self.amount = 0
-        # self.sand_storm_level is the storm meter in the boardgame
-        self.sand_storm_level = 1
+        self.amount = 0 # Amount to cards to draw
+
 
     def create(self):
         # create deck of cards
@@ -494,18 +495,18 @@ class Deck:
         # 1 move cards
         for pattern in storm_patterns:
             for i in range(3):
-                deck.append(StormCard(f"Storm Moves x1 {i+1}/3", [pattern]))
+                deck.append(StormCard(f"Storm Moves x1 {i+1}/3", [pattern], self.game))
 
         # 2 move cards
         for pattern in storm_patterns:
             for i in range(2):
-                deck.append(StormCard(f"Storm Moves x2 {i+1}/2", [pattern, pattern]))
+                deck.append(StormCard(f"Storm Moves x2 {i+1}/2", [pattern, pattern], self.game))
 
         # 3 move cards
         for pattern in storm_patterns:
             for i in range(1):
                 deck.append(
-                    StormCard(f"Storm Moves x3 {i+1}/1", [pattern, pattern, pattern])
+                    StormCard(f"Storm Moves x3 {i+1}/1", [pattern, pattern, pattern], self.game)
                 )
 
         # add sun beats down cards
@@ -514,33 +515,27 @@ class Deck:
 
         # add storm picks up cards
         for i in range(3):
-            deck.append(SPUCard(f"Storm Picks Up {i+1}/3"))
+            deck.append(SPUCard(f"Storm Picks Up {i+1}/3", self.game))
 
         return deck
-
-    def increase_storm_level(self):
-        """ "
-        Increase the sandstorm level by one. This determines the amount of cards drawn each turn.
-        """
-        self.sand_storm_level += 1
 
     def amount_to_draw(self):
         """
         Determine the amount of cards to draw according to the storm level.
         Implemented for 5 players.
         """
-        if self.sand_storm_level <= 1:
+        if self.game.sand_storm_level <= 1:
             self.amount = 2
-        elif 2 <= self.sand_storm_level <= 6:
+        elif 2 <= self.game.sand_storm_level <= 6:
             self.amount = 3
-        elif 7 <= self.sand_storm_level <= 10:
+        elif 7 <= self.game.sand_storm_level <= 10:
             self.amount = 4
-        elif 11 <= self.sand_storm_level <= 13:
+        elif 11 <= self.game.sand_storm_level <= 13:
             self.amount = 5
-        elif 14 <= self.sand_storm_level <= 15:
+        elif 14 <= self.game.sand_storm_level <= 15:
             self.amount = 6
-        elif self.sand_storm_level > 15:
-            raise ValueError("Game Over. Sand storm became too strong.")
+        elif self.game.sand_storm_level > 15:
+            self.game.is_game_over = True
 
     def shuffle(self):
         random.shuffle(self.deck)
@@ -579,11 +574,12 @@ class Deck:
 
 
 class StormCard:
-    def __init__(self, name, moves):
+    def __init__(self, name, moves, game):
         self.name = name
         self.moves = moves
+        self.game = game
 
-    def apply(self, storm, coordinate_to_tile):
+    def apply(self, storm):
         for move in self.moves:
             x_move, y_move = move
             new_x = storm.x_coordinate + x_move
@@ -591,12 +587,12 @@ class StormCard:
 
             # Check if the move is within board boundaries
             if 0 <= new_x <= 4 and 0 <= new_y <= 4:
-                adjacent_tile = coordinate_to_tile[(new_x, new_y)]
+                adjacent_tile = self.game.coordinate_to_tile[(new_x, new_y)]
                 adjacent_tile.add_sand()
                 for adventurer in adjacent_tile.adventurers:
                     adventurer.lose_water()
 
-                storm.swap(adjacent_tile, coordinate_to_tile)
+                storm.swap(adjacent_tile)
 
     def __str__(self):
         return f"{self.name}, {self.moves}"
@@ -617,11 +613,15 @@ class SBDCard:
 
 
 class SPUCard:
-    def __init__(self, name):
+    def __init__(self, name, game):
         self.name = name
+        self.game = game
 
     def __str__(self):
         return self.name
+    
+    def apply(self):
+        self.game.increase_storm_level()
 
 
 class GearDeck:
@@ -743,11 +743,6 @@ class SecretWaterReserve:
 
 def main():
     game = Game()
-    game.print_game()
-
-    explorer = game.adventurers["explorer"]
-    explorer.move((1,0))
-
     game.print_game()
 
 if __name__ == "__main__":
