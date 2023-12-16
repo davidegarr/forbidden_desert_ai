@@ -9,6 +9,7 @@ class Game:
         self.deck = Deck(self) # Creates the deck of cards
         self.sand_storm_level = 1
         self.is_game_over = False # Status flag to control the game loop
+        self.player_order = [] # List that holds the order in which players will take turns
 
         self.setup() # Perform initial game setup
     
@@ -129,6 +130,35 @@ class Game:
         print("\nAdventurers:")
         self.print_adventurers()
         print("\nStorm Level:", self.sand_storm_level, "\n")
+
+    def start_game(self):
+        self.set_player_order()
+        while not self.is_game_over:
+            for adventurer in self.player_order:
+                self.execute_turn(adventurer)
+                if self.is_game_over:
+                    print("Game Over")
+                    break
+    
+    def set_player_order(self):
+        # Find the minimum water level amongst all adventurers
+        min_water_level = min(adventurer.water for adventurer in self.adventurers.values())
+
+        # Add to the list all the adventurers with the minimum amount of water
+        least_water_adventurers = []
+        for adventurer in self.adventurers.values():
+            if adventurer.water == min_water_level:
+                least_water_adventurers.append(adventurer)
+
+        # Between all the adventurers with the least amount of water, choose one at random
+        first_player = random.choice(least_water_adventurers)
+
+        # Create a list of the other players
+        other_players = [adventurer for adventurer in self.adventurers.values() if adventurer != first_player]
+        random.shuffle(other_players)
+
+        # Set the player order starting with the first player followed by the others
+        self.player_order = [first_player] + other_players
 
 
 
