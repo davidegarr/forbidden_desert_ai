@@ -73,15 +73,34 @@ class Game:
                 tile.set_coordinates(x, y)
                 self.coordinate_to_tile[(x, y)] = tile
 
-        for tile in tiles.values():
-            tile.set_coordinate_mapping(coordinate_to_tile)
-
         """
         Add initial sand using the .add_sand() method.
         """
         initial_sand = [(0, 2), (1, 1), (1, 3), (2, 0), (2, 4), (3, 1), (3, 3), (4, 2)]
         for x_sand_tile, y_sand_tile in initial_sand:
             self.coordinate_to_tile[(x_sand_tile, y_sand_tile)].add_sand()
+
+    def initialize_adventurers(self):
+        """
+        Here the adventurers dictionary is initialized, after the board is set.
+        By default, all adventureres go to the "start" Tile.
+        """
+
+        start_tile = self.coordinate_to_tile.get("start")  # Get the start tile from the game's tile mapping
+
+        self.adventurers = {
+            "archeologist": Archeologist("archeologist", "A", start_tile, self, 3),
+            "climber": Climber("climber", "C", start_tile, self, 3),
+            "explorer": Explorer("explorer", "E", start_tile, self, 4),
+            "meteorologist": Meteorologist("meteorologist", "M", start_tile, self, 4),
+            "navigator": Navigator("navigator", "N", start_tile, self, 4),
+            "water_carrier": WaterCarrier("water_carrier", "WC", start_tile, self, 5),
+        }
+
+        # Add the adventurers to the start tile
+        for adventurer in self.adventurers.values():
+            start_tile.add_adventurer(adventurer)
+
 
 
 class Tile:
@@ -208,6 +227,7 @@ class GearTile(Tile):
 
     def apply_flip_effect(self, adventurer):
         #draws a gear card
+        pass
 
 
 class Adventurer:
@@ -227,13 +247,13 @@ class Adventurer:
         give_water(other_adventurer): Transfers 1 water unit to another adventurer if possible.
     """
 
-    def __init__(self, name, symbol, tile, water, coordinate_to_tile):
+    def __init__(self, name, symbol, tile, game, water):
         self.name = name
         self.symbol = symbol
-        self.tile = tile
-        self.coordinate_to_tile = coordinate_to_tile
+        self.tile = tile # Current tile where the adventurer is standing
+        self.game = game
         self.water = water
-        self.max_water = water
+        self.max_water = water # Maximum water they can carry
         self.inventory = []
 
         
@@ -256,7 +276,7 @@ class Adventurer:
 
             # Check if the new coordinates are within the board boundaries
             if 0 <= new_x <= 4 and 0 <= new_y <= 4:
-                adjacent_tile = self.coordinate_to_tile.get((new_x, new_y))
+                adjacent_tile = self.game.coordinate_to_tile.get((new_x, new_y))
 
                 # Check if the adjacent tile is not the storm tile
                 if adjacent_tile and adjacent_tile.name != "storm":
@@ -275,7 +295,7 @@ class Adventurer:
 
             # Check if the new coordinates are within board boundaries and not a storm tile
             if 0 <= new_x <= 4 and 0 <= new_y <= 4:
-                adjacent_tile = self.coordinate_to_tile.get((new_x, new_y))
+                adjacent_tile = self.game.coordinate_to_tile.get((new_x, new_y))
 
                 if adjacent_tile and adjacent_tile.name != "storm" and not adjacent_tile.blocked:
                     valid_moves.append((dx, dy))
@@ -283,13 +303,13 @@ class Adventurer:
         return valid_moves
 
 
-    def move(self, move_direction, coordinate_to_tile):
+    def move(self, move_direction):
         if move_direction in self.available_moves():
             dx, dy = move_direction
             current_x, current_y = self.tile.x_coordinate, self.tile.y_coordinate
 
             new_x, new_y = current_x + dx, current_y + dy
-            new_tile = coordinate_to_tile[(new_x, new_y)]
+            new_tile = self.game.coordinate_to_tile[(new_x, new_y)]
 
             # Update the current tile and the adventurer's position
             self.tile.remove_adventurer(self)
@@ -332,8 +352,8 @@ class Adventurer:
 
 
 class Archeologist(Adventurer):
-    def __init__(self, name, symbol, tile, water, coordinate_to_tile):
-        super().__init__(name, symbol, tile, water, coordinate_to_tile)
+    def __init__(self, name, symbol, tile, game, water):
+        super().__init__(name, symbol, tile, game, water)
 
     def ability(self, tile_to_clear):
         if tile_to_clear in self.available_sand:
@@ -342,13 +362,13 @@ class Archeologist(Adventurer):
 
 
 class Climber(Adventurer):
-    def __init__(self, name, symbol, tile, water, coordinate_to_tile):
-        super().__init__(name, symbol, tile, water, coordinate_to_tile)
+    def __init__(self, name, symbol, tile, game, water):
+        super().__init__(name, symbol, tile, game, water)
 
 
 class Explorer(Adventurer):
-    def __init__(self, name, symbol, tile, water, coordinate_to_tile):
-        super().__init__(name, symbol, tile, water, coordinate_to_tile)
+    def __init__(self, name, symbol, tile, game, water):
+        super().__init__(name, symbol, tile, game, water)
     
 
     def available_moves(self):
@@ -363,7 +383,7 @@ class Explorer(Adventurer):
 
             # Check if the new coordinates are within the board boundaries
             if 0 <= new_x <= 4 and 0 <= new_y <= 4:
-                adjacent_tile = self.coordinate_to_tile.get((new_x, new_y))
+                adjacent_tile = self.game.coordinate_to_tile.get((new_x, new_y))
 
                 # Check if the adjacent tile is not the storm tile
                 if adjacent_tile and adjacent_tile.name != "storm":
@@ -383,7 +403,7 @@ class Explorer(Adventurer):
 
             # Check if the new coordinates are within the board boundaries
             if 0 <= new_x <= 4 and 0 <= new_y <= 4:
-                adjacent_tile = self.coordinate_to_tile.get((new_x, new_y))
+                adjacent_tile = self.game.coordinate_to_tile.get((new_x, new_y))
 
                 # Check if the adjacent tile is not the storm tile
                 if adjacent_tile and adjacent_tile.name != "storm":
@@ -393,13 +413,13 @@ class Explorer(Adventurer):
 
 
 class Meteorologist(Adventurer):
-    def __init__(self, name, symbol, tile, water, coordinate_to_tile):
-        super().__init__(name, symbol, tile, water, coordinate_to_tile)
+    def __init__(self, name, symbol, tile, game, water):
+        super().__init__(name, symbol, tile, game, water)
 
 
 class Navigator(Adventurer):
-    def __init__(self, name, symbol, tile, water, coordinate_to_tile):
-        super().__init__(name, symbol, tile, water, coordinate_to_tile)
+    def __init__(self, name, symbol, tile, game, water):
+        super().__init__(name, symbol, tile, game, water)
 
     def ability(self, other_adventurer, move):
         x_move, y_move = move
@@ -407,19 +427,19 @@ class Navigator(Adventurer):
         new_x = other_adventurer.tile.x_coordinate + x_move
         new_y = other_adventurer.tile.y_coordinate + y_move
 
-        if (0 <= new_x <= 4 and 0 <= new_y <= 4) and not self.coordinate_to_tile[
+        if (0 <= new_x <= 4 and 0 <= new_y <= 4) and not self.game.coordinate_to_tile[
             (new_x, new_y)
         ].blocked:
             other_adventurer.tile.remove_adventurer(other_adventurer)
-            other_adventurer.tile = self.coordinate_to_tile[(new_x, new_y)]
+            other_adventurer.tile = self.game.coordinate_to_tile[(new_x, new_y)]
             other_adventurer.tile.add_adventurer(other_adventurer)
         else:
             raise ValueError("Invalid move for Navigator's ability.")
 
 
 class WaterCarrier(Adventurer):
-    def __init__(self, name, symbol, tile, water, coordinate_to_tile):
-        super().__init__(name, symbol, tile, water, coordinate_to_tile)
+    def __init__(self, name, symbol, tile, game, water):
+        super().__init__(name, symbol, tile, game, water)
 
     def ability(self):
         if (
@@ -688,85 +708,11 @@ class SecretWaterReserve:
             adventurer.get_water()
             print(f"{adventurer.name} now has {adventurer.water} units of water.")
 
-    
-def initialize_tiles(coordinate_to_tile):
-    """
-    The tiles dictionary is the equivalent of the stack of tiles that comes with the boardgame.
-    The same quantity and type of tiles as within the "real" boardgame is depicted here.
-    Each key-value pair consists of a unique tile name and a corresponding Tile object that holds
-    the tile's properties such as its symbol, coordinates, and state (flipped or not, and the amount of sand).
-    """
-    tiles = {
-        "start": GearTile("start", "S", coordinate_to_tile),
-        "storm": Tile("storm", "X", coordinate_to_tile),
-        "tunnel_1": Tile("tunnel_1", "T1", coordinate_to_tile),
-        "tunnel_2": Tile("tunnel_2", "T2", coordinate_to_tile),
-        "tunnel_3": Tile("tunnel_3", "T3", coordinate_to_tile),
-        "boat": Tile("boat", "B", coordinate_to_tile),
-        "gem_h": Tile("gem_h", "Gh", coordinate_to_tile),
-        "gem_v": Tile("gem_v", "Gv", coordinate_to_tile),
-        "motor_h": Tile("motor_h", "Mh", coordinate_to_tile),
-        "motor_v": Tile("motor_v", "Mv", coordinate_to_tile),
-        "compass_h": Tile("compass_h", "Ch", coordinate_to_tile),
-        "compass_v": Tile("compass_v", "Cv", coordinate_to_tile),
-        "propeller_h": Tile("propeller_h", "Ph", coordinate_to_tile),
-        "propeller_v": Tile("propeller_v", "Pv", coordinate_to_tile),
-        "water_1": WaterTile("water_1", "W1", coordinate_to_tile),
-        "water_2": WaterTile("water_2", "W2", coordinate_to_tile),
-        "oasis": MirageTile("mirage", "M", coordinate_to_tile),
-        "dune_1": GearTile("dune_1", "D1", coordinate_to_tile),
-        "dune_2": GearTile("dune_2", "D2", coordinate_to_tile),
-        "dune_3": GearTile("dune_3", "D3", coordinate_to_tile),
-        "dune_4": GearTile("dune_4", "D4", coordinate_to_tile),
-        "dune_5": GearTile("dune_5", "D5", coordinate_to_tile),
-        "dune_6": GearTile("dune_6", "D6", coordinate_to_tile),
-        "dune_7": GearTile("dune_7", "D7", coordinate_to_tile),
-        "dune_8": GearTile("dune_8", "D8", coordinate_to_tile),
-    }
-    return tiles
-
-
-def set_tile_coordinates(tiles):
-    """
-    Assigns coordinates to the tiles and returns the coordinate_to_tile mapping.
-    Only the "storm" tile is placed at a particular place (middle of the board: 2,2), the rest are placed at random.
-    Adds initial sand to board.
-    """
-    # Assign fixed coordinates to the storm tile
-    tiles["storm"].set_coordinates(2, 2)
-
-    # Create a list of all possible coordinates except for the storm's
-    all_coordinates = [(x, y) for x in range(5) for y in range(5)]
-    all_coordinates.remove((2, 2))  # Remove the storm's fixed coordinates
-    random.shuffle(all_coordinates)
-
-    # Initialize coordinate_to_tile with the storm tile
-    coordinate_to_tile = {(2, 2): tiles["storm"]}
-
-    # Assign coordinates to the rest of the tiles
-    for tile_name, tile in tiles.items():
-        if tile.x_coordinate is None and tile.y_coordinate is None:
-            x, y = all_coordinates.pop()
-            tile.set_coordinates(x, y)
-            coordinate_to_tile[(x, y)] = tile
-
-    for tile in tiles.values():
-        tile.set_coordinate_mapping(coordinate_to_tile)
-
-    """
-    Add initial sand using the .add_sand() method.
-    """
-    initial_sand = [(0, 2), (1, 1), (1, 3), (2, 0), (2, 4), (3, 1), (3, 3), (4, 2)]
-    for x_sand_tile, y_sand_tile in initial_sand:
-        coordinate_to_tile[(x_sand_tile, y_sand_tile)].add_sand()
-
-    return coordinate_to_tile
-
 
 def initialize_adventurers(tiles, coordinate_to_tile):
     """
     Here the adventurers dictionary is initialized, after the board is set.
-    By default, all adventureres go to the "start" Tile (see method above).
+    By default, all adventureres go to the "start" Tile.
     """
     adventurers = {
         "archeologist": Archeologist(
