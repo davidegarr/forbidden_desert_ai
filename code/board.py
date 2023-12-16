@@ -126,6 +126,7 @@ class Game:
         print("\nAdventurers:")
         self.print_adventurers()
 
+
 class Tile:
     """
     The Tile class represents a single tile on the Forbidden Desert game board.
@@ -327,6 +328,9 @@ class Adventurer:
 
 
     def move(self, move_direction):
+        print(move_direction)
+        for move in self.available_moves():
+            print("av_move:", move)
         if move_direction in self.available_moves():
             dx, dy = move_direction
             current_x, current_y = self.tile.x_coordinate, self.tile.y_coordinate
@@ -395,7 +399,7 @@ class Explorer(Adventurer):
     
 
     def available_moves(self):
-        accessible_tiles = []
+        valid_moves = []
         current_x, current_y = self.tile.x_coordinate, self.tile.y_coordinate
 
         # Explorer can move diagonally
@@ -404,15 +408,14 @@ class Explorer(Adventurer):
         for dx, dy in directions:
             new_x, new_y = current_x + dx, current_y + dy
 
-            # Check if the new coordinates are within the board boundaries
+            # Check if the new coordinates are within board boundaries and not a storm tile
             if 0 <= new_x <= 4 and 0 <= new_y <= 4:
                 adjacent_tile = self.game.coordinate_to_tile.get((new_x, new_y))
 
-                # Check if the adjacent tile is not the storm tile
-                if adjacent_tile and adjacent_tile.name != "storm":
-                    accessible_tiles.append(adjacent_tile)
+                if adjacent_tile and adjacent_tile.name != "storm" and not adjacent_tile.blocked:
+                    valid_moves.append((dx, dy))
 
-        return accessible_tiles
+        return valid_moves
     
     def available_sand(self):
         accessible_tiles = [self.tile]
@@ -742,6 +745,10 @@ def main():
     game = Game()
     game.print_game()
 
+    explorer = game.adventurers["explorer"]
+    explorer.move((1,0))
+
+    game.print_game()
 
 if __name__ == "__main__":
     main()
