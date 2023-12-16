@@ -102,7 +102,6 @@ class Game:
             start_tile.add_adventurer(adventurer)
 
 
-
 class Tile:
     """
     The Tile class represents a single tile on the Forbidden Desert game board.
@@ -642,6 +641,7 @@ class GearDeck:
         card = self.gear_deck.pop()
         adventurer.get_item(card)
 
+
 class DuneBlaster:
     def __init__(self, name):
         self.name = name
@@ -654,6 +654,7 @@ class DuneBlaster:
         tile.blocked = False
         print("All sand was cleared!")
 
+
 class JetPack:
     def __init__(self, name):
         self.name = name
@@ -663,6 +664,7 @@ class JetPack:
     
     def apply(self, adventurer, move):
         adventurer.move(move)
+
 
 class Terrascope:
     def __init__(self, name):
@@ -674,6 +676,7 @@ class Terrascope:
     def apply(self, tile):
         return tile.name
 
+
 class SolarShield:
     def __init__(self, name):
         self.name = name
@@ -684,6 +687,7 @@ class SolarShield:
     def apply(self):
         pass #TBD
 
+
 class TimeThrottle:
     def __init__(self, name):
         self.name = name
@@ -693,6 +697,7 @@ class TimeThrottle:
     
     def apply(self):
         pass #TBD
+
 
 class SecretWaterReserve:
     def __init__(self, name):
@@ -707,33 +712,6 @@ class SecretWaterReserve:
             adventurer.get_water()
             adventurer.get_water()
             print(f"{adventurer.name} now has {adventurer.water} units of water.")
-
-
-def initialize_adventurers(tiles, coordinate_to_tile):
-    """
-    Here the adventurers dictionary is initialized, after the board is set.
-    By default, all adventureres go to the "start" Tile.
-    """
-    adventurers = {
-        "archeologist": Archeologist(
-            "archeologist", "A", tiles["start"], 3, coordinate_to_tile
-        ),
-        "climber": Climber("climber", "C", tiles["start"], 3, coordinate_to_tile),
-        "explorer": Explorer("explorer", "E", tiles["start"], 4, coordinate_to_tile),
-        "meteorologist": Meteorologist(
-            "meteorologist", "M", tiles["start"], 4, coordinate_to_tile
-        ),
-        "navigator": Navigator("navigator", "N", tiles["start"], 4, coordinate_to_tile),
-        "water_carrier": WaterCarrier(
-            "water_carrier", "WC", tiles["start"], 5, coordinate_to_tile
-        ),
-    }
-
-    # add the adventurers to the start tile
-    for adventurer in adventurers:
-        tiles["start"].add_adventurer(adventurers[adventurer])
-
-    return adventurers
 
 
 def print_board(tiles):
