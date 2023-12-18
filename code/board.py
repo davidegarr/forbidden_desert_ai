@@ -125,7 +125,7 @@ class Game:
             print(adventurer)
     
     def print_game(self):
-        print("Game Board:")
+        print("\nGame Board:")
         self.print_board()
         print("\nAdventurers:")
         self.print_adventurers()
@@ -139,6 +139,7 @@ class Game:
                 if self.is_game_over:
                     print("Game Over")
                     break
+            self.is_game_over = True
     
     def set_player_order(self):
         # Find the minimum water level amongst all adventurers
@@ -165,13 +166,14 @@ class Game:
             possible_actions = self.get_possible_actions(adventurer)
             if possible_actions:
                 chosen_action = random.choice(possible_actions) # Select one of the possible actions at random
-                self.perform_action(adventurer, chosen_action)
+                #self.perform_action(adventurer, chosen_action)
+                print(adventurer.name, "chosen action:", chosen_action)
             else:
                 print(f"{adventurer.name} has no actions available.")
                 break # Pass it to the next adventurer, although I don't think this situation is possible in game
 
         self.deck.draw() # Draw cards from the StormDeck at the end of every turn
-        self.check_game_status()
+        #self.check_game_status()
     
     def get_possible_actions(self, adventurer):
         possible_actions = []
@@ -197,7 +199,6 @@ class Game:
         
         return possible_actions
         
-
 
 class Tile:
     """
@@ -601,7 +602,7 @@ class Deck:
 
         # add sun beats down cards
         for i in range(4):
-            deck.append(SBDCard(f"Sun Beats Down {i+1}/4"))
+            deck.append(SBDCard(f"Sun Beats Down {i+1}/4", self.game))
 
         # add storm picks up cards
         for i in range(3):
@@ -636,7 +637,7 @@ class Deck:
 
         self.shuffle()
 
-    def draw(self, storm=None, tiles=None, coordinate_to_tile=None):
+    def draw(self, storm=None, tiles=None):
         drawn_cards = []
         self.amount_to_draw()
         amount = self.amount
@@ -651,11 +652,11 @@ class Deck:
             print(card)
             # Apply the effect of the drawn card
             if isinstance(card, StormCard):
-                card.apply(storm, coordinate_to_tile)
+                card.apply()
             elif isinstance(card, SBDCard):
-                card.apply(tiles)
+                card.apply(self.game)
             elif isinstance(card, SPUCard):
-                self.increase_storm_level()
+                self.game.increase_storm_level()
 
         return drawn_cards  # Return a list of drawn cards
 
@@ -669,7 +670,8 @@ class StormCard:
         self.moves = moves
         self.game = game
 
-    def apply(self, storm):
+    def apply(self):
+        storm = self.game.tiles["storm"]
         for move in self.moves:
             x_move, y_move = move
             new_x = storm.x_coordinate + x_move
@@ -689,11 +691,12 @@ class StormCard:
 
 
 class SBDCard:
-    def __init__(self, name):
+    def __init__(self, name, game):
         self.name = name
+        self.game = game
 
     def apply(self, tiles):
-        for tile in tiles.values():
+        for tile in self.game.tiles.values():
             if not tile.flipped and "tunnel" not in tile.name:
                 for adventurer in tile.adventurers:
                     adventurer.lose_water()
@@ -833,7 +836,13 @@ class SecretWaterReserve:
 
 def main():
     game = Game()
+    print("Starting game...")
     game.print_game()
+
+    game.start_game()
+
+    game.print_game()
+
 
 if __name__ == "__main__":
     main()
