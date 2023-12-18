@@ -159,7 +159,32 @@ class Game:
 
         # Set the player order starting with the first player followed by the others
         self.player_order = [first_player] + other_players
+    
+    def execute_turn(self, adventurer):
+        for _ in range(4): #each adventurer gets 4 actions
+            possible_actions = self.get_possible_actions(adventurer)
+            if possible_actions:
+                chosen_action = random.choice(possible_actions) # Select one of the possible actions at random
+                self.perform_action(adventurer, chosen_action)
+            else:
+                print(f"{adventurer.name} has no actions available.")
+                break # Pass it to the next adventurer, although I don't think this situation is possible in game
 
+        self.deck.draw() # Draw cards from the StormDeck at the end of every turn
+        self.check_game_status()
+    
+    def get_possible_actions(self, adventurer):
+        possible_actions = []
+
+        # Add "move" actions with their corresponding move directions
+        for move in adventurer.available_moves():
+            possible_actions.append(("move", move))
+        
+        # Check if the adventurer can flip the current tile:
+        # Implement logic that involves checking if the tile has been already
+        # flpped or if its blocked. If any is true, return False
+        
+        
 
 
 class Tile:
