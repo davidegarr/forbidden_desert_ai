@@ -181,9 +181,21 @@ class Game:
             possible_actions.append(("move", move))
         
         # Check if the adventurer can flip the current tile:
-        # Implement logic that involves checking if the tile has been already
-        # flpped or if its blocked. If any is true, return False
+        if adventurer.can_flip():
+            possible_actions.append(("flip",))
         
+        # Check if adventurer can clear sand from any accesible tile
+        for tile in adventurer.available_sand():
+            possible_actions.append(("remove_sand", tile))
+
+        # Check if adventurer can perform special ability
+            
+        # Check if adventurer can pickup a boat piece
+            
+        # Check if adventurer can share water
+        # Should i have this here?
+        
+        return possible_actions
         
 
 
@@ -346,11 +358,21 @@ class Adventurer:
             f"{self.name} ({self.symbol}) at {self.tile.name}. {self.water} water left. Inventory: {self.inventory}"
         )
     
+    def can_flip(self):
+        return not self.tile.flipped and self.tile.sand == 0
+    
     def flip(self):
         self.tile.flip(self)
 
     def available_sand(self):
-        accessible_tiles = [self.tile]
+        if self.tile.blocked:
+            return [self.tile]
+        
+        accessible_tiles = []
+
+        if self.tile.sand > 0:
+            accessible_tiles = [self.tile]
+        
         current_x, current_y = self.tile.x_coordinate, self.tile.y_coordinate
 
         directions = [(-1, 0), (1, 0), (0, 1), (0, -1)]
@@ -363,12 +385,15 @@ class Adventurer:
                 adjacent_tile = self.game.coordinate_to_tile.get((new_x, new_y))
 
                 # Check if the adjacent tile is not the storm tile
-                if adjacent_tile and adjacent_tile.name != "storm":
+                if adjacent_tile and adjacent_tile.name != "storm" and adjacent_tile.sand > 0:
                     accessible_tiles.append(adjacent_tile)
 
         return accessible_tiles
 
     def available_moves(self):
+        if self.tile.blocked:
+            return []
+        
         valid_moves = []
         current_x, current_y = self.tile.x_coordinate, self.tile.y_coordinate
 
@@ -455,6 +480,9 @@ class Explorer(Adventurer):
     
 
     def available_moves(self):
+        if self.tile.blocked:
+            return []
+        
         valid_moves = []
         current_x, current_y = self.tile.x_coordinate, self.tile.y_coordinate
 
@@ -474,7 +502,14 @@ class Explorer(Adventurer):
         return valid_moves
     
     def available_sand(self):
-        accessible_tiles = [self.tile]
+        if self.tile.blocked:
+                return [self.tile]
+            
+        accessible_tiles = []
+
+        if self.tile.sand > 0:
+                accessible_tiles = [self.tile]
+
         current_x, current_y = self.tile.x_coordinate, self.tile.y_coordinate
 
         # Climber can remove sand diagonally (including duneblaser.)
@@ -488,7 +523,7 @@ class Explorer(Adventurer):
                 adjacent_tile = self.game.coordinate_to_tile.get((new_x, new_y))
 
                 # Check if the adjacent tile is not the storm tile
-                if adjacent_tile and adjacent_tile.name != "storm":
+                if adjacent_tile and adjacent_tile.name != "storm" and adjacent_tile.sand > 0:
                     accessible_tiles.append(adjacent_tile)
 
         return accessible_tiles
