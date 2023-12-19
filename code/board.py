@@ -27,6 +27,15 @@ class Game:
         self.deck.shuffle()
         self.gear_deck.shuffle()
 
+        game_state = f"Initial State:\n"
+        game_state += f"Storm Level: {self.sand_storm_level}\n"
+        game_state += "Game Board: \n"
+        game_state += self.get_board_representation()
+        game_state += "\n\nAdventurers:\n"
+        game_state += self.get_adventurers_representation() + "\n\n"
+
+        self.log_file.write(game_state)
+
     def initialize_tiles(self):
         """
         The tiles dictionary is the equivalent of the stack of tiles that comes with the boardgame.
@@ -299,7 +308,7 @@ class Tile:
 
     def __str__(self):
         return (
-            f"{self.name} at {self.x_coordinate, self.y_coordinate}. Sand: {self.sand}."
+            f"{self.name} at {self.x_coordinate, self.y_coordinate}. Sand: {self.sand}"
         )
 
     def add_adventurer(self, adventurer):
@@ -384,7 +393,6 @@ class GearTile(Tile):
         self.game.gear_deck.draw(adventurer)
         pass
         
-
 
 class Adventurer:
     """
