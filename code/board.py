@@ -8,6 +8,7 @@ class Game:
         self.tiles = {}  # Dictionary to store tiles by name
         self.adventurers = {}  # Holds the adventurers by name
         self.deck = Deck(self)  # Creates the deck of cards
+        self.gear_deck = GearDeck(self) # Creates the deck of gear cards
         self.sand_storm_level = 1
         self.is_game_over = False  # Status flag to control the game loop
         self.player_order = (
@@ -21,6 +22,7 @@ class Game:
         self.initialize_tiles()
         self.initialize_adventurers()
         self.deck.shuffle()
+        self.gear_deck.shuffle()
 
     def initialize_tiles(self):
         """
@@ -206,7 +208,7 @@ class Game:
 
         # Check if the adventurer can flip the current tile:
         if adventurer.can_flip():
-            possible_actions.append(("flip", adventurer.tile))
+            possible_actions.append(("flip", adventurer))
 
         # Check if adventurer can clear sand from any accesible tile
         for tile in adventurer.available_sand():
@@ -331,9 +333,9 @@ class Tile:
 
 class WaterTile(Tile):
     def __init__(
-        self, name, symbol, coordinate_to_tile, x_coordinate=None, y_coordinate=None
+        self, name, symbol, game, x_coordinate=None, y_coordinate=None
     ):
-        super().__init__(name, symbol, coordinate_to_tile, x_coordinate, y_coordinate)
+        super().__init__(name, symbol, game, x_coordinate, y_coordinate)
 
     def apply_flip_effect(self, adventurer):
         # adventurer is actually not needed TBD
@@ -344,9 +346,9 @@ class WaterTile(Tile):
 
 class MirageTile(Tile):
     def __init__(
-        self, name, symbol, coordinate_to_tile, x_coordinate=None, y_coordinate=None
+        self, name, symbol, game, x_coordinate=None, y_coordinate=None
     ):
-        super().__init__(name, symbol, coordinate_to_tile, x_coordinate, y_coordinate)
+        super().__init__(name, symbol, game, x_coordinate, y_coordinate)
 
     def apply_flip_effect(self, adventurer):
         # adventurer is actually not needed TBD
@@ -355,13 +357,14 @@ class MirageTile(Tile):
 
 class GearTile(Tile):
     def __init__(
-        self, name, symbol, coordinate_to_tile, x_coordinate=None, y_coordinate=None
+        self, name, symbol, game, x_coordinate=None, y_coordinate=None
     ):
-        super().__init__(name, symbol, coordinate_to_tile, x_coordinate, y_coordinate)
+        super().__init__(name, symbol, game, x_coordinate, y_coordinate)
 
     def apply_flip_effect(self, adventurer):
-        # draws a gear card
+        self.game.gear_deck.draw(adventurer)
         pass
+        
 
 
 class Adventurer:
@@ -790,7 +793,8 @@ class SPUCard:
 
 
 class GearDeck:
-    def __init__(self):
+    def __init__(self, game):
+        self.game = game
         self.gear_deck = self.create()
 
     def create(self):
