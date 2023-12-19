@@ -1,18 +1,21 @@
 import random
 
+
 class Game:
     def __init__(self) -> None:
-        #Initialize game state
-        self.coordinate_to_tile = {} # Holds the mapping from coordinates to tiles
-        self.tiles = {} # Dictionary to store tiles by name
-        self.adventurers = {} # Holds the adventurers by name
-        self.deck = Deck(self) # Creates the deck of cards
+        # Initialize game state
+        self.coordinate_to_tile = {}  # Holds the mapping from coordinates to tiles
+        self.tiles = {}  # Dictionary to store tiles by name
+        self.adventurers = {}  # Holds the adventurers by name
+        self.deck = Deck(self)  # Creates the deck of cards
         self.sand_storm_level = 1
-        self.is_game_over = False # Status flag to control the game loop
-        self.player_order = [] # List that holds the order in which players will take turns
+        self.is_game_over = False  # Status flag to control the game loop
+        self.player_order = (
+            []
+        )  # List that holds the order in which players will take turns
 
-        self.setup() # Perform initial game setup
-    
+        self.setup()  # Perform initial game setup
+
     def setup(self):
         # Call methods to initialize the game components
         self.initialize_tiles()
@@ -90,15 +93,21 @@ class Game:
         """
         Here the adventurers dictionary is initialized, after the board is set.
         By default, all adventureres go to the "start" Tile.
-        """ 
+        """
 
         self.adventurers = {
-            "archeologist": Archeologist("archeologist", "A", self.tiles["start"], self, 3),
+            "archeologist": Archeologist(
+                "archeologist", "A", self.tiles["start"], self, 3
+            ),
             "climber": Climber("climber", "C", self.tiles["start"], self, 3),
             "explorer": Explorer("explorer", "E", self.tiles["start"], self, 4),
-            "meteorologist": Meteorologist("meteorologist", "M", self.tiles["start"], self, 4),
+            "meteorologist": Meteorologist(
+                "meteorologist", "M", self.tiles["start"], self, 4
+            ),
             "navigator": Navigator("navigator", "N", self.tiles["start"], self, 4),
-            "water_carrier": WaterCarrier("water_carrier", "WC", self.tiles["start"], self, 5),
+            "water_carrier": WaterCarrier(
+                "water_carrier", "WC", self.tiles["start"], self, 5
+            ),
         }
 
         # Add the adventurers to the start tile
@@ -120,11 +129,11 @@ class Game:
         for row in board_representation:
             print(" | ".join(cell for cell in row))
             print("-" * (6 * 5 + 4 * 4))
-    
+
     def print_adventurers(self):
         for adventurer in self.adventurers.values():
             print(adventurer)
-    
+
     def print_game(self):
         print("\nGame Board:")
         self.print_board()
@@ -140,10 +149,12 @@ class Game:
                 if self.is_game_over:
                     print("Game Over")
                     break
-    
+
     def set_player_order(self):
         # Find the minimum water level amongst all adventurers
-        min_water_level = min(adventurer.water for adventurer in self.adventurers.values())
+        min_water_level = min(
+            adventurer.water for adventurer in self.adventurers.values()
+        )
 
         # Add to the list all the adventurers with the minimum amount of water
         least_water_adventurers = []
@@ -155,49 +166,59 @@ class Game:
         first_player = random.choice(least_water_adventurers)
 
         # Create a list of the other players
-        other_players = [adventurer for adventurer in self.adventurers.values() if adventurer != first_player]
+        other_players = [
+            adventurer
+            for adventurer in self.adventurers.values()
+            if adventurer != first_player
+        ]
         random.shuffle(other_players)
 
         # Set the player order starting with the first player followed by the others
         self.player_order = [first_player] + other_players
-    
+
     def execute_turn(self, adventurer):
-        for _ in range(4): #each adventurer gets 4 actions
+        for _ in range(4):  # each adventurer gets 4 actions
             possible_actions = self.get_possible_actions(adventurer)
             if possible_actions:
-                chosen_action = random.choice(possible_actions) # Select one of the possible actions at random
-                print(adventurer.name, "chosen action:", chosen_action[0], chosen_action[1])
+                chosen_action = random.choice(
+                    possible_actions
+                )  # Select one of the possible actions at random
+                print(
+                    adventurer.name,
+                    "chosen action:",
+                    chosen_action[0],
+                    chosen_action[1],
+                )
                 self.perform_action(adventurer, chosen_action)
             else:
                 print(f"{adventurer.name} has no actions available.")
-                break # Pass it to the next adventurer, although I don't think this situation is possible in game
+                break  # Pass it to the next adventurer, although I don't think this situation is possible in game
 
-        self.deck.draw() # Draw cards from the StormDeck at the end of every turn
+        self.deck.draw()  # Draw cards from the StormDeck at the end of every turn
         self.check_game_status()
 
-    
     def get_possible_actions(self, adventurer):
         possible_actions = []
 
         # Add "move" actions with their corresponding move directions
         for move in adventurer.available_moves():
             possible_actions.append(("move", move))
-        
+
         # Check if the adventurer can flip the current tile:
         if adventurer.can_flip():
             possible_actions.append(("flip", adventurer.tile))
-        
+
         # Check if adventurer can clear sand from any accesible tile
         for tile in adventurer.available_sand():
             possible_actions.append(("remove_sand", tile))
 
         # Check if adventurer can perform special ability
-            
+
         # Check if adventurer can pickup a boat piece
-            
+
         # Check if adventurer can share water
         # Should i have this here?
-        
+
         return possible_actions
 
     def perform_action(self, adventurer, chosen_action):
@@ -209,13 +230,12 @@ class Game:
         elif action_type == "remove_sand":
             tile_to_clear = chosen_action[1]
             adventurer.clear_sand(tile_to_clear)
-    
+
     def check_game_status(self):
         if any(adventurer.water == 0 for adventurer in self.adventurers.values()):
             self.is_game_over = True
             print("Game Over: An adventurer has run out of water")
 
-        
 
 class Tile:
     """
@@ -316,7 +336,7 @@ class WaterTile(Tile):
         super().__init__(name, symbol, coordinate_to_tile, x_coordinate, y_coordinate)
 
     def apply_flip_effect(self, adventurer):
-        #adventurer is actually not needed TBD
+        # adventurer is actually not needed TBD
         for adventurer in self.adventurers:
             adventurer.get_water()
             adventurer.get_water()
@@ -329,7 +349,7 @@ class MirageTile(Tile):
         super().__init__(name, symbol, coordinate_to_tile, x_coordinate, y_coordinate)
 
     def apply_flip_effect(self, adventurer):
-        #adventurer is actually not needed TBD
+        # adventurer is actually not needed TBD
         print("The well is dry...")
 
 
@@ -340,7 +360,7 @@ class GearTile(Tile):
         super().__init__(name, symbol, coordinate_to_tile, x_coordinate, y_coordinate)
 
     def apply_flip_effect(self, adventurer):
-        #draws a gear card
+        # draws a gear card
         pass
 
 
@@ -364,33 +384,30 @@ class Adventurer:
     def __init__(self, name, symbol, tile, game, water):
         self.name = name
         self.symbol = symbol
-        self.tile = tile # Current tile where the adventurer is standing
+        self.tile = tile  # Current tile where the adventurer is standing
         self.game = game
         self.water = water
-        self.max_water = water # Maximum water they can carry
+        self.max_water = water  # Maximum water they can carry
         self.inventory = []
 
-        
     def __str__(self):
-        return (
-            f"{self.name} ({self.symbol}) at {self.tile.name}. {self.water} water left. Inventory: {self.inventory}"
-        )
-    
+        return f"{self.name} ({self.symbol}) at {self.tile.name}. {self.water} water left. Inventory: {self.inventory}"
+
     def can_flip(self):
         return not self.tile.flipped and self.tile.sand == 0
-    
+
     def flip(self):
         self.tile.flip(self)
 
     def available_sand(self):
         if self.tile.blocked:
             return [self.tile]
-        
+
         accessible_tiles = []
 
         if self.tile.sand > 0:
             accessible_tiles = [self.tile]
-        
+
         current_x, current_y = self.tile.x_coordinate, self.tile.y_coordinate
 
         directions = [(-1, 0), (1, 0), (0, 1), (0, -1)]
@@ -403,7 +420,11 @@ class Adventurer:
                 adjacent_tile = self.game.coordinate_to_tile.get((new_x, new_y))
 
                 # Check if the adjacent tile is not the storm tile
-                if adjacent_tile and adjacent_tile.name != "storm" and adjacent_tile.sand > 0:
+                if (
+                    adjacent_tile
+                    and adjacent_tile.name != "storm"
+                    and adjacent_tile.sand > 0
+                ):
                     accessible_tiles.append(adjacent_tile)
 
         return accessible_tiles
@@ -411,7 +432,7 @@ class Adventurer:
     def available_moves(self):
         if self.tile.blocked:
             return []
-        
+
         valid_moves = []
         current_x, current_y = self.tile.x_coordinate, self.tile.y_coordinate
 
@@ -424,7 +445,11 @@ class Adventurer:
             if 0 <= new_x <= 4 and 0 <= new_y <= 4:
                 adjacent_tile = self.game.coordinate_to_tile.get((new_x, new_y))
 
-                if adjacent_tile and adjacent_tile.name != "storm" and not adjacent_tile.blocked:
+                if (
+                    adjacent_tile
+                    and adjacent_tile.name != "storm"
+                    and not adjacent_tile.blocked
+                ):
                     valid_moves.append((dx, dy))
 
         return valid_moves
@@ -495,17 +520,25 @@ class Climber(Adventurer):
 class Explorer(Adventurer):
     def __init__(self, name, symbol, tile, game, water):
         super().__init__(name, symbol, tile, game, water)
-    
 
     def available_moves(self):
         if self.tile.blocked:
             return []
-        
+
         valid_moves = []
         current_x, current_y = self.tile.x_coordinate, self.tile.y_coordinate
 
         # Explorer can move diagonally
-        directions = [(-1, 0), (1, 0), (0, 1), (0, -1), (1, 1), (1, -1), (-1, 1), (-1, -1)]
+        directions = [
+            (-1, 0),
+            (1, 0),
+            (0, 1),
+            (0, -1),
+            (1, 1),
+            (1, -1),
+            (-1, 1),
+            (-1, -1),
+        ]
 
         for dx, dy in directions:
             new_x, new_y = current_x + dx, current_y + dy
@@ -514,24 +547,37 @@ class Explorer(Adventurer):
             if 0 <= new_x <= 4 and 0 <= new_y <= 4:
                 adjacent_tile = self.game.coordinate_to_tile.get((new_x, new_y))
 
-                if adjacent_tile and adjacent_tile.name != "storm" and not adjacent_tile.blocked:
+                if (
+                    adjacent_tile
+                    and adjacent_tile.name != "storm"
+                    and not adjacent_tile.blocked
+                ):
                     valid_moves.append((dx, dy))
 
         return valid_moves
-    
+
     def available_sand(self):
         if self.tile.blocked:
-                return [self.tile]
-            
+            return [self.tile]
+
         accessible_tiles = []
 
         if self.tile.sand > 0:
-                accessible_tiles = [self.tile]
+            accessible_tiles = [self.tile]
 
         current_x, current_y = self.tile.x_coordinate, self.tile.y_coordinate
 
         # Climber can remove sand diagonally (including duneblaser.)
-        directions = [(-1, 0), (1, 0), (0, 1), (0, -1), (1, 1), (1, -1), (-1, 1), (-1, -1)]
+        directions = [
+            (-1, 0),
+            (1, 0),
+            (0, 1),
+            (0, -1),
+            (1, 1),
+            (1, -1),
+            (-1, 1),
+            (-1, -1),
+        ]
 
         for dx, dy in directions:
             new_x, new_y = current_x + dx, current_y + dy
@@ -541,7 +587,11 @@ class Explorer(Adventurer):
                 adjacent_tile = self.game.coordinate_to_tile.get((new_x, new_y))
 
                 # Check if the adjacent tile is not the storm tile
-                if adjacent_tile and adjacent_tile.name != "storm" and adjacent_tile.sand > 0:
+                if (
+                    adjacent_tile
+                    and adjacent_tile.name != "storm"
+                    and adjacent_tile.sand > 0
+                ):
                     accessible_tiles.append(adjacent_tile)
 
         return accessible_tiles
@@ -591,8 +641,7 @@ class Deck:
         self.game = game
         self.deck = self.create()
         self.discard_pile = []
-        self.amount = 0 # Amount to cards to draw
-
+        self.amount = 0  # Amount to cards to draw
 
     def create(self):
         # create deck of cards
@@ -608,13 +657,19 @@ class Deck:
         # 2 move cards
         for pattern in storm_patterns:
             for i in range(2):
-                deck.append(StormCard(f"Storm Moves x2 {i+1}/2", [pattern, pattern], self.game))
+                deck.append(
+                    StormCard(f"Storm Moves x2 {i+1}/2", [pattern, pattern], self.game)
+                )
 
         # 3 move cards
         for pattern in storm_patterns:
             for i in range(1):
                 deck.append(
-                    StormCard(f"Storm Moves x3 {i+1}/1", [pattern, pattern, pattern], self.game)
+                    StormCard(
+                        f"Storm Moves x3 {i+1}/1",
+                        [pattern, pattern, pattern],
+                        self.game,
+                    )
                 )
 
         # add sun beats down cards
@@ -729,7 +784,7 @@ class SPUCard:
 
     def __str__(self):
         return self.name
-    
+
     def apply(self):
         self.game.increase_storm_level()
 
@@ -782,10 +837,10 @@ class GearDeck:
 class DuneBlaster:
     def __init__(self, name):
         self.name = name
-    
+
     def __str__(self):
         return self.name
-    
+
     def apply(self, tile):
         tile.sand = 0
         tile.blocked = False
@@ -795,10 +850,10 @@ class DuneBlaster:
 class JetPack:
     def __init__(self, name):
         self.name = name
-    
+
     def __str__(self):
         return self.name
-    
+
     def apply(self, adventurer, move):
         adventurer.move(move)
 
@@ -806,10 +861,10 @@ class JetPack:
 class Terrascope:
     def __init__(self, name):
         self.name = name
-    
+
     def __str__(self):
         return self.name
-    
+
     def apply(self, tile):
         return tile.name
 
@@ -822,24 +877,24 @@ class SolarShield:
         return self.name
 
     def apply(self):
-        pass #TBD
+        pass  # TBD
 
 
 class TimeThrottle:
     def __init__(self, name):
         self.name = name
-    
+
     def __str__(self):
         return self.name
-    
+
     def apply(self):
-        pass #TBD
+        pass  # TBD
 
 
 class SecretWaterReserve:
     def __init__(self, name):
         self.name = name
-    
+
     def __str__(self):
         return self.name
 
