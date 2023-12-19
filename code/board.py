@@ -2,7 +2,8 @@ import random
 
 
 class Game:
-    def __init__(self) -> None:
+    def __init__(self, log_file) -> None:
+        self.log_file = log_file
         # Initialize game state
         self.coordinate_to_tile = {}  # Holds the mapping from coordinates to tiles
         self.tiles = {}  # Dictionary to store tiles by name
@@ -14,6 +15,10 @@ class Game:
         self.player_order = (
             []
         )  # List that holds the order in which players will take turns
+        
+        self.round = 1 # A round is defined as a turn for each player
+        self.turn = 1 # A turn is defined as 4 actions from an adventurer
+        self.action = 1 # An action is defined as one of the 4 activities that an adventurer can perform in each turn
 
         self.setup()  # Perform initial game setup
 
@@ -119,29 +124,38 @@ class Game:
     def increase_storm_level(self):
         self.sand_storm_level += 1
 
-    def print_board(self):
+    def get_board_representation(self):
         board_representation = [["" for _ in range(5)] for _ in range(5)]
-
         for _, tile in self.coordinate_to_tile.items():
             x, y = tile.x_coordinate, tile.y_coordinate
             symbol = tile.symbol
             sand = f"({tile.sand})" if tile.sand > 0 else " "
             board_representation[y][x] = f"{symbol:<2}{sand:<3}"
 
-        for row in board_representation:
-            print(" | ".join(cell for cell in row))
-            print("-" * (6 * 5 + 4 * 4))
+        board_str = "-" * (6 * 5 + 4 * 3) + "\n"  # Start with a line of dashes
+        board_str += "\n".join("| " + " | ".join(cell for cell in row) + " |" + "\n" + "-" * (6 * 5 + 4 * 3) for row in board_representation)
+        return board_str
 
-    def print_adventurers(self):
-        for adventurer in self.adventurers.values():
-            print(adventurer)
+    def get_adventurers_representation(self):
+        adventurers_str = "\n".join(str(adventurer) for adventurer in self.adventurers.values())
+        return adventurers_str
+    
+    def print_game(self, adventurer, chosen_action):
+        #print("Game Board:")
+        #self.print_board()
+        #print("\nAdventurers:")
+        #self.print_adventurers()
+        #print("\nStorm Level:", self.sand_storm_level, "\n")
 
-    def print_game(self):
-        print("\nGame Board:")
-        self.print_board()
-        print("\nAdventurers:")
-        self.print_adventurers()
-        print("\nStorm Level:", self.sand_storm_level, "\n")
+        game_state = f"{self.round}." + f"{self.turn}." + f"{self.action}: \n"
+        game_state += f"Storm Level: {self.sand_storm_level}\n"
+        game_state += "Game Board: \n"
+        game_state += self.get_board_representation()
+        game_state += "\n\nAdventurers:\n"
+        game_state += self.get_adventurers_representation() + "\n\n"
+        game_state += f"{adventurer.name}: {chosen_action[0]}, {chosen_action[1]}.\n\n"
+
+        self.log_file.write(game_state)
 
     def start_game(self):
         self.set_player_order()
@@ -233,10 +247,12 @@ class Game:
             tile_to_clear = chosen_action[1]
             adventurer.clear_sand(tile_to_clear)
 
+        self.print_game(adventurer, chosen_action)
+
     def check_game_status(self):
         if any(adventurer.water == 0 for adventurer in self.adventurers.values()):
             self.is_game_over = True
-            print("Game Over: An adventurer has run out of water")
+            print("An adventurer has run out of water")
 
 
 class Tile:
@@ -911,13 +927,10 @@ class SecretWaterReserve:
 
 
 def main():
-    game = Game()
-    print("Starting game...")
-    game.print_game()
-
-    game.start_game()
-
-    game.print_game()
+    with open("game_log.txt", "w") as log_file:
+        game = Game(log_file)
+        print("Starting game...")
+        game.start_game()
 
 
 if __name__ == "__main__":
