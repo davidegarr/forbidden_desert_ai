@@ -17,6 +17,7 @@ class Game:
         # Call methods to initialize the game components
         self.initialize_tiles()
         self.initialize_adventurers()
+        self.deck.shuffle()
 
     def initialize_tiles(self):
         """
@@ -166,8 +167,8 @@ class Game:
             possible_actions = self.get_possible_actions(adventurer)
             if possible_actions:
                 chosen_action = random.choice(possible_actions) # Select one of the possible actions at random
-                #self.perform_action(adventurer, chosen_action)
-                print(adventurer.name, "chosen action:", chosen_action)
+                print(adventurer.name, "chosen action:", chosen_action[0], chosen_action[1])
+                self.perform_action(adventurer, chosen_action)
             else:
                 print(f"{adventurer.name} has no actions available.")
                 break # Pass it to the next adventurer, although I don't think this situation is possible in game
@@ -184,7 +185,7 @@ class Game:
         
         # Check if the adventurer can flip the current tile:
         if adventurer.can_flip():
-            possible_actions.append(("flip",))
+            possible_actions.append(("flip", adventurer.tile))
         
         # Check if adventurer can clear sand from any accesible tile
         for tile in adventurer.available_sand():
@@ -198,6 +199,16 @@ class Game:
         # Should i have this here?
         
         return possible_actions
+
+    def perform_action(self, adventurer, chosen_action):
+        action_type = chosen_action[0]
+        if action_type == "move":
+            adventurer.move(chosen_action[1])
+        elif action_type == "flip":
+            adventurer.flip()
+        elif action_type == "remove_sand":
+            tile_to_clear = chosen_action[1]
+            adventurer.clear_sand(tile_to_clear)
         
 
 class Tile:
@@ -447,7 +458,7 @@ class Adventurer:
         other_adventurer.water += 1
 
     def clear_sand(self, tile_to_clear):
-        if tile_to_clear in self.available_sand:
+        if tile_to_clear in self.available_sand():
             tile_to_clear.remove_sand()
 
     def get_item(self, gear_card):
@@ -637,7 +648,7 @@ class Deck:
 
         self.shuffle()
 
-    def draw(self, storm=None, tiles=None):
+    def draw(self):
         drawn_cards = []
         self.amount_to_draw()
         amount = self.amount
