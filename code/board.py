@@ -140,7 +140,6 @@ class Game:
                 if self.is_game_over:
                     print("Game Over")
                     break
-            self.is_game_over = True
     
     def set_player_order(self):
         # Find the minimum water level amongst all adventurers
@@ -174,7 +173,8 @@ class Game:
                 break # Pass it to the next adventurer, although I don't think this situation is possible in game
 
         self.deck.draw() # Draw cards from the StormDeck at the end of every turn
-        #self.check_game_status()
+        self.check_game_status()
+
     
     def get_possible_actions(self, adventurer):
         possible_actions = []
@@ -209,6 +209,12 @@ class Game:
         elif action_type == "remove_sand":
             tile_to_clear = chosen_action[1]
             adventurer.clear_sand(tile_to_clear)
+    
+    def check_game_status(self):
+        if any(adventurer.water == 0 for adventurer in self.adventurers.values()):
+            self.is_game_over = True
+            print("Game Over: An adventurer has run out of water")
+
         
 
 class Tile:
