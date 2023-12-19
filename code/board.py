@@ -12,9 +12,7 @@ class Game:
         self.gear_deck = GearDeck(self) # Creates the deck of gear cards
         self.sand_storm_level = 1
         self.is_game_over = False  # Status flag to control the game loop
-        self.player_order = (
-            []
-        )  # List that holds the order in which players will take turns
+        self.player_order = []  # List that holds the order in which players will take turns
         
         self.round = 1 # A round is defined as a turn for each player
         self.turn = 1 # A turn is defined as 4 actions from an adventurer
@@ -149,11 +147,11 @@ class Game:
 
         game_state = f"{self.round}." + f"{self.turn}." + f"{self.action}: \n"
         game_state += f"Storm Level: {self.sand_storm_level}\n"
+        game_state += f"{adventurer.name}: {chosen_action[0]}, {chosen_action[1]}.\n"
         game_state += "Game Board: \n"
         game_state += self.get_board_representation()
         game_state += "\n\nAdventurers:\n"
         game_state += self.get_adventurers_representation() + "\n\n"
-        game_state += f"{adventurer.name}: {chosen_action[0]}, {chosen_action[1]}.\n\n"
 
         self.log_file.write(game_state)
 
@@ -165,6 +163,8 @@ class Game:
                 if self.is_game_over:
                     print("Game Over")
                     break
+            self.round += 1
+            self.turn = 1
 
     def set_player_order(self):
         # Find the minimum water level amongst all adventurers
@@ -193,6 +193,7 @@ class Game:
         self.player_order = [first_player] + other_players
 
     def execute_turn(self, adventurer):
+        self.action = 1
         for _ in range(4):  # each adventurer gets 4 actions
             possible_actions = self.get_possible_actions(adventurer)
             if possible_actions:
@@ -206,10 +207,12 @@ class Game:
                     chosen_action[1],
                 )
                 self.perform_action(adventurer, chosen_action)
+                self.action += 1
             else:
                 print(f"{adventurer.name} has no actions available.")
                 break  # Pass it to the next adventurer, although I don't think this situation is possible in game
-
+        
+        self.turn += 1
         self.deck.draw()  # Draw cards from the StormDeck at the end of every turn
         self.check_game_status()
 
