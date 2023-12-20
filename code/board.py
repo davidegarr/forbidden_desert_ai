@@ -46,9 +46,9 @@ class Game:
         tiles = {
             "start": GearTile("start", "S", self),
             "storm": Tile("storm", "X", self),
-            "tunnel_1": Tile("tunnel_1", "T1", self),
-            "tunnel_2": Tile("tunnel_2", "T2", self),
-            "tunnel_3": Tile("tunnel_3", "T3", self),
+            "tunnel_1": TunnelTile("tunnel_1", "T1", self),
+            "tunnel_2": TunnelTile("tunnel_2", "T2", self),
+            "tunnel_3": TunnelTile("tunnel_3", "T3", self),
             "boat": Tile("boat", "B", self),
             "gem_h": Tile("gem_h", "Gh", self),
             "gem_v": Tile("gem_v", "Gv", self),
@@ -156,7 +156,7 @@ class Game:
 
         game_state = f"{self.round}." + f"{self.turn}." + f"{self.action}: \n"
         game_state += f"Storm Level: {self.sand_storm_level}\n"
-        game_state += f"{adventurer.name}: {chosen_action[0]}, {chosen_action[1]}.\n"
+        game_state += f"{adventurer.name}: {chosen_action[0]}, {chosen_action[1]}. Cost: {chosen_action[2]}.\n"
         game_state += "Game Board: \n"
         game_state += self.get_board_representation()
         game_state += "\n\nAdventurers:\n"
@@ -203,24 +203,18 @@ class Game:
 
     def execute_turn(self, adventurer):
         self.action = 1
-        for _ in range(4):  # each adventurer gets 4 actions
+
+        action_points = 4 # Each adventurer can spend 4 action points per turn
+        while action_points > 0:
             possible_actions = self.get_possible_actions(adventurer)
-            if possible_actions:
-                chosen_action = random.choice(
-                    possible_actions
-                )  # Select one of the possible actions at random
-                print(
-                    adventurer.name,
-                    "chosen action:",
-                    chosen_action[0],
-                    chosen_action[1],
-                )
-                self.perform_action(adventurer, chosen_action)
-                self.action += 1
-            else:
-                print(f"{adventurer.name} has no actions available.")
-                break  # Pass it to the next adventurer, although I don't think this situation is possible in game
-        
+            chosen_action = random.choice(possible_actions) # Select one of the actions at random
+            action_cost = chosen_action[2]
+            print(adventurer.name, "chosen action:", chosen_action[0], chosen_action[1], "cost:", action_cost)
+            self.perform_action(adventurer, chosen_action)
+            self.action += action_cost
+            action_points -= action_cost
+
+
         self.turn += 1
         self.deck.draw()  # Draw cards from the StormDeck at the end of every turn
         self.check_game_status()
@@ -230,15 +224,15 @@ class Game:
 
         # Add "move" actions with their corresponding move directions
         for move in adventurer.available_moves():
-            possible_actions.append(("move", move))
+            possible_actions.append(("move", move, 1))
 
         # Check if the adventurer can flip the current tile:
         if adventurer.can_flip():
-            possible_actions.append(("flip", adventurer))
+            possible_actions.append(("flip", adventurer, 1))
 
         # Check if adventurer can clear sand from any accesible tile
         for tile in adventurer.available_sand():
-            possible_actions.append(("remove_sand", tile))
+            possible_actions.append(("remove_sand", tile, 1))
 
         # Check if adventurer can perform special ability
 
@@ -246,6 +240,16 @@ class Game:
 
         # Check if adventurer can share water
         # Should i have this here?
+
+        # Sharing water between adventurers in the same tile
+        for tile in self.tiles.values():
+            if len(tile.adventurers) > 1:  # There's potential for water sharing
+                for i, adventurer in enumerate(tile.adventurers):
+                    for other_adventurer in tile.adventurers[i+1:]:
+                        if adventurer.water > 0 and other_adventurer.water < other_adventurer.max_water:
+                            possible_actions.append(("share_water", (adventurer, other_adventurer), 0))
+
+            
 
         return possible_actions
 
@@ -258,6 +262,10 @@ class Game:
         elif action_type == "remove_sand":
             tile_to_clear = chosen_action[1]
             adventurer.clear_sand(tile_to_clear)
+        elif action_type == "share_water":
+            water_giver = chosen_action[1][0]
+            water_reciever = chosen_action[1][1]
+            water_giver.give_water(water_reciever)
 
         self.print_game(adventurer, chosen_action)
 
@@ -391,8 +399,18 @@ class GearTile(Tile):
 
     def apply_flip_effect(self, adventurer):
         self.game.gear_deck.draw(adventurer)
-        pass
-        
+
+
+class TunnelTile(Tile):
+    def __init__(
+        self, name, symbol, game, x_coordinate=None, y_coordinate=None
+    ):
+        super().__init__(name, symbol, game, x_coordinate, y_coordinate)
+    
+    def apply_flip_effect(self, adventurer):
+        self.game.gear_deck.draw(adventurer)
+
+
 
 class Adventurer:
     """
