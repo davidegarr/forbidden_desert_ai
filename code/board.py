@@ -283,8 +283,7 @@ class Game:
     def check_game_status(self):
         if any(adventurer.water == 0 for adventurer in self.adventurers.values()):
             self.is_game_over = True
-            print("An adventurer has run out of water")
-
+            self.log_file.write("Game over. An adventurer has run out of water.")
 
 class Tile:
     """
@@ -791,6 +790,7 @@ class Deck:
                 card.apply(self.game)
             elif isinstance(card, SPUCard):
                 self.game.increase_storm_level()
+                self.game.log_file.write(f"{card.name}. Storm Level: {self.game.sand_storm_level}. Next turn draw {self.amount} cards.\n\n")
 
         return drawn_cards  # Return a list of drawn cards
 
@@ -830,7 +830,8 @@ class SBDCard:
         self.name = name
         self.game = game
 
-    def apply(self, tiles):
+    def apply(self, tiles): # I dont think we need to pass tiles here? TBD
+        self.game.log_file.write(f"{self.name}\n\n")
         for tile in self.game.tiles.values():
             if not tile.flipped and "tunnel" not in tile.name:
                 for adventurer in tile.adventurers:
@@ -847,9 +848,6 @@ class SPUCard:
 
     def __str__(self):
         return self.name
-
-    def apply(self):
-        self.game.increase_storm_level()
 
 
 class GearDeck:
