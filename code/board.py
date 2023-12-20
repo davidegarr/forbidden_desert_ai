@@ -257,8 +257,6 @@ class Game:
                         if other_adventurer.water < other_adventurer.max_water:
                             possible_actions.append(("give_water", (adventurer, other_adventurer), 0))
 
-            
-
         return possible_actions
 
     def perform_action(self, adventurer, chosen_action):
@@ -422,7 +420,6 @@ class TunnelTile(Tile):
     
     def apply_flip_effect(self, adventurer):
         self.game.gear_deck.draw(adventurer)
-
 
 
 class Adventurer:
@@ -809,6 +806,7 @@ class StormCard:
 
     def apply(self):
         storm = self.game.tiles["storm"]
+        self.game.log_file.write(f"{self.name}, {self.moves}\n\n")
         for move in self.moves:
             x_move, y_move = move
             new_x = storm.x_coordinate + x_move
