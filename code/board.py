@@ -238,16 +238,24 @@ class Game:
 
         # Check if adventurer can pickup a boat piece
 
-        # Check if adventurer can share water
-        # Should i have this here?
+        # Sharing items from inventory
+        for tile in self.tiles.values():
+            if len(tile.adventurers) > 1:  # There's potential for item sharing
+                for i, adventurer in enumerate(tile.adventurers):
+                    if adventurer.inventory:  # Check if adventurer has items to share
+                        for other_adventurer in tile.adventurers[i+1:]:
+                            for item in adventurer.inventory:
+                                # Add an action for each item the adventurer can share
+                                possible_actions.append(("give_item", (adventurer, other_adventurer, item), 0))
+
 
         # Sharing water between adventurers in the same tile
         for tile in self.tiles.values():
             if len(tile.adventurers) > 1:  # There's potential for water sharing
                 for i, adventurer in enumerate(tile.adventurers):
                     for other_adventurer in tile.adventurers[i+1:]:
-                        if adventurer.water > 0 and other_adventurer.water < other_adventurer.max_water:
-                            possible_actions.append(("share_water", (adventurer, other_adventurer), 0))
+                        if other_adventurer.water < other_adventurer.max_water:
+                            possible_actions.append(("give_water", (adventurer, other_adventurer), 0))
 
             
 
@@ -262,10 +270,15 @@ class Game:
         elif action_type == "remove_sand":
             tile_to_clear = chosen_action[1]
             adventurer.clear_sand(tile_to_clear)
-        elif action_type == "share_water":
+        elif action_type == "give_water":
             water_giver = chosen_action[1][0]
             water_reciever = chosen_action[1][1]
             water_giver.give_water(water_reciever)
+        elif action_type == "give_item":
+            item_giver = chosen_action[1][0]
+            item_reciever = chosen_action[1][1]
+            item = chosen_action[1][2]
+            item_giver.give_item(item_reciever, item)
 
         self.print_game(adventurer, chosen_action)
 
@@ -535,6 +548,10 @@ class Adventurer:
 
         self.water -= 1
         other_adventurer.water += 1
+
+    def give_item(self, other_adventurer, item):
+        self.inventory.remove(item)
+        other_adventurer.inventory.append(item)
 
     def clear_sand(self, tile_to_clear):
         if tile_to_clear in self.available_sand():
