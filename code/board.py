@@ -171,7 +171,6 @@ class Game:
 
     def start_game(self):
         self.set_player_order()
-        self.compass_tiles_flipped += 1
         while not self.is_game_over:
             for adventurer in self.player_order:
                 self.execute_turn(adventurer)
@@ -400,6 +399,14 @@ class Tile:
         self.y_coordinate = y_coordinate
 
     def swap(self, other_tile):
+        # if the storm tile (only one to trigger swap) has a boat part, give it immediately to the next tile after swap
+        if self.boat_parts:
+            for part in self.boat_parts[:]:  # iterating over a copy of the list
+                self.game.log_file.write(f"{part} is now on {other_tile}.\n")
+                self.boat_parts.remove(part)
+                other_tile.boat_parts.append(part)
+
+
         # swap coordinates
         temp_x, temp_y = self.x_coordinate, self.y_coordinate
         self.x_coordinate, self.y_coordinate = (
@@ -479,7 +486,7 @@ class PartTile(Tile):
     
     def apply_flip_effect(self, adventurer):
         if "gem" in self.name:
-            self.game.gem_tiles_flpped += 1
+            self.game.gem_tiles_flipped += 1
         elif "motor" in self.name:
             self.game.motor_tiles_flipped += 1
         elif "compass" in self.name:
