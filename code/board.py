@@ -243,6 +243,9 @@ class Game:
         # Check if adventurer can perform special ability
 
         # Check if adventurer can pickup a boat piece
+        if adventurer.tile.boat_parts:
+            for item in adventurer.tile.boat_parts:
+                possible_actions.append(("pick_part", (adventurer, item), 1))
 
         # Sharing items from inventory
         for tile in self.tiles.values():
@@ -286,6 +289,10 @@ class Game:
             item_reciever = chosen_action[1][1]
             item = chosen_action[1][2]
             item_giver.give_item(item_reciever, item)
+        elif action_type == "pick_part":
+            adventurer = chosen_action[1][0]
+            part = chosen_action[1][1]
+            adventurer.pick_part(part)
 
         self.print_game(adventurer, chosen_action)
 
@@ -300,7 +307,7 @@ class Game:
             propeller_y_tile = self.tiles["propeller_h"].y_coordinate
             propeller_tile = self.coordinate_to_tile[(propeller_x_tile, propeller_y_tile)]
             self.log_file.write(f"Propeller has appeared at {propeller_tile.name} \n")
-            propeller_tile.inventory.append("Propeller")
+            propeller_tile.boat_parts.append("Propeller")
             self.propeller_tiles_flipped += 1
 
         elif self.motor_tiles_flipped == 2:
@@ -308,7 +315,7 @@ class Game:
             motor_y_tile = self.tiles["motor_h"].y_coordinate
             motor_tile = self.coordinate_to_tile[(motor_x_tile, motor_y_tile)]
             self.log_file.write(f"Motor has appeared at {motor_tile.name}\n")
-            motor_tile.inventory.append("Motor")
+            motor_tile.boat_parts.append("Motor")
             self.motor_tiles_flipped += 1
         
         elif self.gem_tiles_flipped == 2:
@@ -316,7 +323,7 @@ class Game:
             gem_y_tile = self.tiles["gem_h"].y_coordinate
             gem_tile = self.coordinate_to_tile[(gem_x_tile, gem_y_tile)]
             self.log_file.write(f"Gem has appeared at {gem_tile.name}\n")
-            gem_tile.inventory.append("Gem")
+            gem_tile.boat_parts.append("Gem")
             self.gem_tiles_flipped += 1
         
         elif self.compass_tiles_flipped == 2:
@@ -324,7 +331,7 @@ class Game:
             compass_y_tile = self.tiles["compass_h"].y_coordinate
             compass_tile = self.coordinate_to_tile[(compass_x_tile, compass_y_tile)]
             self.log_file.write(f"Compass has appeared at {compass_tile.name}\n")
-            compass_tile.inventory.append("Compass")
+            compass_tile.boat_parts.append("Compass")
             self.compass_tiles_flipped += 1
 
 
@@ -366,7 +373,7 @@ class Tile:
         self.flipped = flipped
         self.blocked = blocked
         self.adventurers = []  # List of adventurers on this tile
-        self.inventory = [] # List of boat parts on this tile
+        self.boat_parts = [] # List of boat parts on this tile
 
     def __str__(self):
         return (
@@ -505,6 +512,7 @@ class Adventurer:
         self.water = water
         self.max_water = water  # Maximum water they can carry
         self.inventory = []
+        self.boat_parts = []
 
     def __str__(self):
         return f"{self.name} ({self.symbol}) at {self.tile.name}. {self.water} water left. Inventory: {self.inventory}"
@@ -615,6 +623,10 @@ class Adventurer:
 
     def use_item(self, item):
         pass
+
+    def pick_part(self, part):
+        self.tile.boat_parts.remove(part)
+        self.boat_parts.append(part)
 
 
 class Archeologist(Adventurer):
