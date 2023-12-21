@@ -20,6 +20,11 @@ class Game:
 
         self.setup()  # Perform initial game setup
 
+        self.motor_tiles_flipped = 0
+        self.propeller_tiles_flipped = 0
+        self.gem_tiles_flipped = 0
+        self.compass_tiles_flipped = 0
+
     def setup(self):
         # Call methods to initialize the game components
         self.initialize_tiles()
@@ -50,14 +55,14 @@ class Game:
             "tunnel_2": TunnelTile("tunnel_2", "T2", self),
             "tunnel_3": TunnelTile("tunnel_3", "T3", self),
             "boat": Tile("boat", "B", self),
-            "gem_h": Tile("gem_h", "Gh", self),
-            "gem_v": Tile("gem_v", "Gv", self),
-            "motor_h": Tile("motor_h", "Mh", self),
-            "motor_v": Tile("motor_v", "Mv", self),
-            "compass_h": Tile("compass_h", "Ch", self),
-            "compass_v": Tile("compass_v", "Cv", self),
-            "propeller_h": Tile("propeller_h", "Ph", self),
-            "propeller_v": Tile("propeller_v", "Pv", self),
+            "gem_h": PartTile("gem_h", "Gh", self),
+            "gem_v": PartTile("gem_v", "Gv", self),
+            "motor_h": PartTile("motor_h", "Mh", self),
+            "motor_v": PartTile("motor_v", "Mv", self),
+            "compass_h": PartTile("compass_h", "Ch", self),
+            "compass_v": PartTile("compass_v", "Cv", self),
+            "propeller_h": PartTile("propeller_h", "Ph", self),
+            "propeller_v": PartTile("propeller_v", "Pv", self),
             "water_1": WaterTile("water_1", "W1", self),
             "water_2": WaterTile("water_2", "W2", self),
             "oasis": MirageTile("mirage", "M", self),
@@ -166,6 +171,7 @@ class Game:
 
     def start_game(self):
         self.set_player_order()
+        self.compass_tiles_flipped += 1
         while not self.is_game_over:
             for adventurer in self.player_order:
                 self.execute_turn(adventurer)
@@ -260,11 +266,14 @@ class Game:
         return possible_actions
 
     def perform_action(self, adventurer, chosen_action):
+        self.log_file.write(f"{chosen_action[0]}, {chosen_action[1]}\n")
         action_type = chosen_action[0]
         if action_type == "move":
             adventurer.move(chosen_action[1])
         elif action_type == "flip":
             adventurer.flip()
+            if isinstance(adventurer.tile, PartTile):
+                self.check_placement()
         elif action_type == "remove_sand":
             tile_to_clear = chosen_action[1]
             adventurer.clear_sand(tile_to_clear)
@@ -284,6 +293,40 @@ class Game:
         if any(adventurer.water == 0 for adventurer in self.adventurers.values()):
             self.is_game_over = True
             self.log_file.write("Game over. An adventurer has run out of water.")
+
+    def check_placement(self):
+        if self.propeller_tiles_flipped == 2:
+            propeller_x_tile = self.tiles["propeller_v"].x_coordinate
+            propeller_y_tile = self.tiles["propeller_h"].y_coordinate
+            propeller_tile = self.coordinate_to_tile[(propeller_x_tile, propeller_y_tile)]
+            self.log_file.write(f"Propeller has appeared at {propeller_tile.name} \n")
+            propeller_tile.inventory.append("Propeller")
+            self.propeller_tiles_flipped += 1
+
+        elif self.motor_tiles_flipped == 2:
+            motor_x_tile = self.tiles["motor_v"].x_coordinate
+            motor_y_tile = self.tiles["motor_h"].y_coordinate
+            motor_tile = self.coordinate_to_tile[(motor_x_tile, motor_y_tile)]
+            self.log_file.write(f"Motor has appeared at {motor_tile.name}\n")
+            motor_tile.inventory.append("Motor")
+            self.motor_tiles_flipped += 1
+        
+        elif self.gem_tiles_flipped == 2:
+            gem_x_tile = self.tiles["gem_v"].x_coordinate
+            gem_y_tile = self.tiles["gem_h"].y_coordinate
+            gem_tile = self.coordinate_to_tile[(gem_x_tile, gem_y_tile)]
+            self.log_file.write(f"Gem has appeared at {gem_tile.name}\n")
+            gem_tile.inventory.append("Gem")
+            self.gem_tiles_flipped += 1
+        
+        elif self.compass_tiles_flipped == 2:
+            compass_x_tile = self.tiles["compass_v"].x_coordinate
+            compass_y_tile = self.tiles["compass_h"].y_coordinate
+            compass_tile = self.coordinate_to_tile[(compass_x_tile, compass_y_tile)]
+            self.log_file.write(f"Compass has appeared at {compass_tile.name}\n")
+            compass_tile.inventory.append("Compass")
+            self.compass_tiles_flipped += 1
+
 
 class Tile:
     """
@@ -323,6 +366,7 @@ class Tile:
         self.flipped = flipped
         self.blocked = blocked
         self.adventurers = []  # List of adventurers on this tile
+        self.inventory = [] # List of boat parts on this tile
 
     def __str__(self):
         return (
@@ -419,6 +463,21 @@ class TunnelTile(Tile):
     
     def apply_flip_effect(self, adventurer):
         self.game.gear_deck.draw(adventurer)
+
+class PartTile(Tile):
+    def __init__(
+        self, name, symbol, game, x_coordinate=None, y_coordinate=None
+    ):
+        super().__init__(name, symbol, game, x_coordinate, y_coordinate)
+    
+    def apply_flip_effect(self, adventurer):
+        if "gem" in self.name:
+            self.game.gem_tiles_flpped += 1
+        elif "motor" in self.name:
+            self.game.motor_tiles_flipped += 1
+        elif "compass" in self.name:
+            self.game.compass_tiles_flipped += 1
+        elif "propeller" in self.name: self.game.propeller_tiles_flipped += 1
 
 
 class Adventurer:
