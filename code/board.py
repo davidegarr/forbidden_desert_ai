@@ -537,11 +537,6 @@ class Adventurer:
             self.water = 0
 
     def give_water(self, other_adventurer):
-        if self.water == 0:
-            raise ValueError("Not enough water to give.")
-        if other_adventurer.water == other_adventurer.max_water:
-            raise ValueError("Cannot give water. Full deposit.")
-
         self.water -= 1
         other_adventurer.water += 1
 
