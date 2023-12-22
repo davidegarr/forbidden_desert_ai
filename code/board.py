@@ -256,7 +256,6 @@ class Game:
                                 # Add an action for each item the adventurer can share
                                 possible_actions.append(("give_item", (adventurer, other_adventurer, item), 0))
 
-
         # Sharing water between adventurers in the same tile
         for tile in self.tiles.values():
             if len(tile.adventurers) > 1:  # There's potential for water sharing
@@ -264,6 +263,16 @@ class Game:
                     for other_adventurer in tile.adventurers[i+1:]:
                         if other_adventurer.water < other_adventurer.max_water:
                             possible_actions.append(("give_water", (adventurer, other_adventurer), 0))
+
+        # Move between tunnel tiles
+        if isinstance(adventurer.tile, TunnelTile):
+            current_tunnel = adventurer.tile
+            if not current_tunnel.blocked and current_tunnel.flipped:
+                all_tunnels = [self.tiles["tunnel_1"], self.tiles["tunnel_2"], self.tiles["tunnel_3"]]
+                for tunnel in all_tunnels:
+                    if tunnel.flipped and tunnel != current_tunnel and not tunnel.blocked:
+                        possible_actions.append(("use_tunnel", (adventurer, tunnel), 1))
+
 
         return possible_actions
 
@@ -477,6 +486,7 @@ class TunnelTile(Tile):
     
     def apply_flip_effect(self, adventurer):
         self.game.gear_deck.draw(adventurer)
+
 
 class PartTile(Tile):
     def __init__(
