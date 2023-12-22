@@ -301,6 +301,10 @@ class Game:
             adventurer = chosen_action[1][0]
             part = chosen_action[1][1]
             adventurer.pick_part(part)
+        elif action_type == "use_tunnel":
+            adventurer = chosen_action[1][0]
+            tunnel = chosen_action[1][1] # This is the tunnel that the adventurer is travelling to.
+            adventurer.use_tunnel(tunnel)
 
         self.print_game(adventurer, chosen_action)
 
@@ -609,6 +613,12 @@ class Adventurer:
             self.tile = new_tile
         else:
             raise ValueError("Invalid move.")
+
+    def use_tunnel (self, tunnel):
+        # Update the current tile and the adventurer's position
+        self.tile.remove_adventurer(self)
+        tunnel.add_adventurer(self)
+        self.tile = tunnel
 
     def get_water(self):
         self.water += 1
