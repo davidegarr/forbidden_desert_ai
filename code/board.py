@@ -24,6 +24,7 @@ class Game:
         self.propeller_tiles_flipped = 0
         self.gem_tiles_flipped = 0
         self.compass_tiles_flipped = 0
+        self.boat_parts_picked = 0
 
     def setup(self):
         # Call methods to initialize the game components
@@ -175,7 +176,7 @@ class Game:
             for adventurer in self.player_order:
                 self.execute_turn(adventurer)
                 if self.is_game_over:
-                    print("Game Over")
+                    #print("Game Over")
                     break
             self.round += 1
             self.turn = 1
@@ -214,15 +215,14 @@ class Game:
             possible_actions = self.get_possible_actions(adventurer)
             chosen_action = random.choice(possible_actions) # Select one of the actions at random
             action_cost = chosen_action[2]
-            print(adventurer.name, "chosen action:", chosen_action[0], chosen_action[1], "cost:", action_cost)
+            #print(adventurer.name, "chosen action:", chosen_action[0], chosen_action[1], "cost:", action_cost)
             self.perform_action(adventurer, chosen_action)
             self.action += action_cost
             action_points -= action_cost
-
+            self.check_game_status()
 
         self.turn += 1
         self.deck.draw()  # Draw cards from the StormDeck at the end of every turn
-        self.check_game_status()
 
     def get_possible_actions(self, adventurer):
         possible_actions = []
@@ -242,7 +242,7 @@ class Game:
         # Check if adventurer can perform special ability
 
         # Check if adventurer can pickup a boat piece
-        if adventurer.tile.boat_parts:
+        if adventurer.tile.boat_parts and adventurer.tile.flipped and not adventurer.tile.blocked:
             for item in adventurer.tile.boat_parts:
                 possible_actions.append(("pick_part", (adventurer, item), 1))
 
@@ -301,6 +301,7 @@ class Game:
             adventurer = chosen_action[1][0]
             part = chosen_action[1][1]
             adventurer.pick_part(part)
+            self.boat_parts_picked += 1
         elif action_type == "use_tunnel":
             adventurer = chosen_action[1][0]
             tunnel = chosen_action[1][1] # This is the tunnel that the adventurer is travelling to.
@@ -312,6 +313,9 @@ class Game:
         if any(adventurer.water == 0 for adventurer in self.adventurers.values()):
             self.is_game_over = True
             self.log_file.write("Game over. An adventurer has run out of water.")
+        elif self.all_parts_collected() and self.all_adventurers_on_boat():
+            self.is_game_over = True
+            self.log_file.write("Game won!")
 
     def check_placement(self):
         if self.propeller_tiles_flipped == 2:
@@ -346,6 +350,14 @@ class Game:
             compass_tile.boat_parts.append("Compass")
             self.compass_tiles_flipped += 1
 
+    def all_parts_collected(self):
+        return self.boat_parts_picked == 4
+
+    def all_adventurers_on_boat(self):
+        boat_tile = self.tiles.get("boat")  # Get the boat tile object
+        if not boat_tile.blocked:  # Check if boat tile exists and is not blocked
+            return all(adventurer.tile == boat_tile for adventurer in self.adventurers.values())
+        return False
 
 class Tile:
     """
@@ -399,7 +411,7 @@ class Tile:
         self.adventurers.remove(adventurer)
 
     def flip(self, adventurer):
-        print(f"{adventurer.name} has flipped tile {self.name}")
+        #print(f"{adventurer.name} has flipped tile {self.name}")
         self.flipped = True
         self.apply_flip_effect(adventurer)
 
@@ -469,7 +481,8 @@ class MirageTile(Tile):
 
     def apply_flip_effect(self, adventurer):
         # adventurer is actually not needed TBD
-        print("The well is dry...")
+        #print("The well is dry...")
+        pass
 
 
 class GearTile(Tile):
@@ -875,7 +888,7 @@ class Deck:
             self.discard_pile.append(card)
             drawn_cards.append(card)
 
-            print(card)
+            #print(card)
             # Apply the effect of the drawn card
             if isinstance(card, StormCard):
                 card.apply()
@@ -999,7 +1012,7 @@ class DuneBlaster:
     def apply(self, tile):
         tile.sand = 0
         tile.blocked = False
-        print("All sand was cleared!")
+        #print("All sand was cleared!")
 
 
 class JetPack:
@@ -1054,7 +1067,7 @@ class SecretWaterReserve:
         return self.name
 
     def apply(self, adventurer):
-        print(f"{adventurer.name} uses {self.name} on {adventurer.tile.name}.")
+        #print(f"{adventurer.name} uses {self.name} on {adventurer.tile.name}.")
         for adventurer in adventurer.tile.adventurers:
             adventurer.get_water()
             adventurer.get_water()
