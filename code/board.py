@@ -17,6 +17,7 @@ class Game:
         self.round = 1 # A round is defined as a turn for each player
         self.turn = 1 # A turn is defined as 4 actions from an adventurer
         self.action = 1 # An action is defined as one of the 4 activities that an adventurer can perform in each turn
+        self.action_points = 4 # Each adventurer can spend 4 action points per turn
 
         self.setup()  # Perform initial game setup
 
@@ -209,16 +210,16 @@ class Game:
 
     def execute_turn(self, adventurer):
         self.action = 1
-
-        action_points = 4 # Each adventurer can spend 4 action points per turn
-        while action_points > 0:
+        self.action_points = 4 # Each adventurer can spend 4 action points per turn
+        
+        while self.action_points > 0:
             possible_actions = self.get_possible_actions(adventurer)
             chosen_action = random.choice(possible_actions) # Select one of the actions at random
             action_cost = chosen_action[2]
             #print(adventurer.name, "chosen action:", chosen_action[0], chosen_action[1], "cost:", action_cost)
             self.perform_action(adventurer, chosen_action)
             self.action += action_cost
-            action_points -= action_cost
+            self.action_points -= action_cost
             self.check_game_status()
 
         self.turn += 1
@@ -239,6 +240,10 @@ class Game:
         for tile in adventurer.available_sand():
             possible_actions.append(("remove_sand", tile, 1))
 
+        # Check if an adventurer can use TImeThrottle from their inventory
+        if "Time Throttle" in adventurer.inventory:
+            possible_actions.append(("use_item", (adventurer, TimeThrottle), -2))
+
         # Check if adventurer can perform special ability
 
         # Check if adventurer can pickup a boat piece
@@ -249,8 +254,8 @@ class Game:
         # Sharing items from inventory
         for tile in self.tiles.values():
             if len(tile.adventurers) > 1:  # There's potential for item sharing
-                for i, adventurer in enumerate(tile.adventurers):
-                    if adventurer.inventory:  # Check if adventurer has items to share
+                for i, adv in enumerate(tile.adventurers):
+                    if adv.inventory:  # Check if adventurer has items to share
                         for other_adventurer in tile.adventurers[i+1:]:
                             for item in adventurer.inventory:
                                 # Add an action for each item the adventurer can share
@@ -306,6 +311,12 @@ class Game:
             adventurer = chosen_action[1][0]
             tunnel = chosen_action[1][1] # This is the tunnel that the adventurer is travelling to.
             adventurer.use_tunnel(tunnel)
+        elif action_type == "use_item":
+            adventurer = chosen_action[1][0]
+            item = chosen_action[1][1]
+
+            if isinstance(item, TimeThrottle):
+                pass
 
         self.print_game(adventurer, chosen_action)
 
@@ -358,6 +369,7 @@ class Game:
         if not boat_tile.blocked:  # Check if boat tile exists and is not blocked
             return all(adventurer.tile == boat_tile for adventurer in self.adventurers.values())
         return False
+
 
 class Tile:
     """
@@ -1071,7 +1083,7 @@ class SecretWaterReserve:
         for adventurer in adventurer.tile.adventurers:
             adventurer.get_water()
             adventurer.get_water()
-            print(f"{adventurer.name} now has {adventurer.water} units of water.")
+            #print(f"{adventurer.name} now has {adventurer.water} units of water.")
 
 
 def main():
