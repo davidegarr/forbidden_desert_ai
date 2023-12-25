@@ -216,8 +216,10 @@ class Game:
         while self.action_points > 0 and self.is_game_over == False:
             possible_actions = self.get_possible_actions(adventurer)
             chosen_action = random.choice(possible_actions) # Select one of the actions at random
+            if chosen_action[0] == "pass":
+                self.log_file.write(f"{adventurer} skips their turn.\n\n")
+                break
             action_cost = chosen_action[2]
-            #print(adventurer.name, "chosen action:", chosen_action[0], chosen_action[1], "cost:", action_cost)
             self.perform_action(adventurer, chosen_action)
             if action_cost > 0:
                 self.action += 1
@@ -229,6 +231,9 @@ class Game:
 
     def get_possible_actions(self, adventurer):
         possible_actions = []
+
+        # Rules: "adventuers can take *up to* 4 actions"
+        possible_actions.append(("pass", "pass", 0))
         
         # Add "move" actions with their corresponding move directions
         for move in adventurer.available_moves():
@@ -571,6 +576,9 @@ class Adventurer:
 
     def __str__(self):
         return f"{self.name} ({self.symbol}) at {self.tile.name}. {self.water} water left. Inventory: {self.inventory}"
+
+    def __repr__(self):
+        return f"{self.name}"
 
     def can_flip(self):
         return not self.tile.flipped and self.tile.sand == 0
