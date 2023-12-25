@@ -11,6 +11,7 @@ class Game:
         self.deck = Deck(self)  # Creates the deck of cards
         self.gear_deck = GearDeck(self) # Creates the deck of gear cards
         self.sand_storm_level = 1
+        self.total_sand = 0
         self.is_game_over = False  # Status flag to control the game loop
         self.player_order = []  # List that holds the order in which players will take turns
         
@@ -173,12 +174,6 @@ class Game:
 
     def start_game(self):
         self.set_player_order()
-        # Correct way to add an instance of TimeThrottle to the inventory
-        time_throttle_instance = TimeThrottle("Time Throttle")
-        time_throttle_instance2 = TimeThrottle("Time Throttle2")
-        self.adventurers["archeologist"].inventory.append(time_throttle_instance)
-        self.adventurers["archeologist"].inventory.append(time_throttle_instance2)
-
         while not self.is_game_over:
             for adventurer in self.player_order:
                 self.execute_turn(adventurer)
@@ -218,13 +213,14 @@ class Game:
         self.action = 1
         self.action_points = 4 # Each adventurer can spend 4 action points per turn
         
-        while self.action_points > 0:
+        while self.action_points > 0 and self.is_game_over == False:
             possible_actions = self.get_possible_actions(adventurer)
             chosen_action = random.choice(possible_actions) # Select one of the actions at random
             action_cost = chosen_action[2]
             #print(adventurer.name, "chosen action:", chosen_action[0], chosen_action[1], "cost:", action_cost)
             self.perform_action(adventurer, chosen_action)
-            self.action += action_cost
+            if action_cost > 0:
+                self.action += 1
             self.action_points -= action_cost
             self.check_game_status()
 
@@ -251,7 +247,8 @@ class Game:
         
         if adventurer.inventory:
             for item in adventurer.inventory:
-                possible_actions.append(("use_item", (adventurer, item), -2))
+                if isinstance (item, TimeThrottle):
+                    possible_actions.append(("use_item", (adventurer, item), -2))
 
         # Check if adventurer can perform special ability
 
@@ -328,9 +325,12 @@ class Game:
         self.print_game(adventurer, chosen_action)
 
     def check_game_status(self):
-        if any(adventurer.water == 0 for adventurer in self.adventurers.values()):
+        if any(adventurer.water <= 0 for adventurer in self.adventurers.values()):
             self.is_game_over = True
             self.log_file.write("Game over. An adventurer has run out of water.")
+        elif self.total_sand > 48:
+            self.is_game_over = True
+            self.log_file.write("Game Over. Adventurers have been buried in the sand.")
         elif self.all_parts_collected() and self.all_adventurers_on_boat():
             self.is_game_over = True
             self.log_file.write("Game won!")
@@ -467,11 +467,13 @@ class Tile:
 
     def add_sand(self):
         self.sand += 1
+        self.game.total_sand += 1
         if self.sand > 1:
             self.blocked = True
 
     def remove_sand(self):
         self.sand -= 1
+        self.game.total_sand -= 1
         if self.sand < 0:
             self.sand = 0
 
