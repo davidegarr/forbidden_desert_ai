@@ -173,6 +173,12 @@ class Game:
 
     def start_game(self):
         self.set_player_order()
+        # Correct way to add an instance of TimeThrottle to the inventory
+        time_throttle_instance = TimeThrottle("Time Throttle")
+        time_throttle_instance2 = TimeThrottle("Time Throttle2")
+        self.adventurers["archeologist"].inventory.append(time_throttle_instance)
+        self.adventurers["archeologist"].inventory.append(time_throttle_instance2)
+
         while not self.is_game_over:
             for adventurer in self.player_order:
                 self.execute_turn(adventurer)
@@ -227,7 +233,7 @@ class Game:
 
     def get_possible_actions(self, adventurer):
         possible_actions = []
-
+        
         # Add "move" actions with their corresponding move directions
         for move in adventurer.available_moves():
             possible_actions.append(("move", move, 1))
@@ -239,10 +245,13 @@ class Game:
         # Check if adventurer can clear sand from any accesible tile
         for tile in adventurer.available_sand():
             possible_actions.append(("remove_sand", tile, 1))
-
+        
         # Check if an adventurer can use TImeThrottle from their inventory
-        if "Time Throttle" in adventurer.inventory:
-            possible_actions.append(("use_item", (adventurer, TimeThrottle), -2))
+        #if TimeThrottle in adventurer.inventory:
+        
+        if adventurer.inventory:
+            for item in adventurer.inventory:
+                possible_actions.append(("use_item", (adventurer, item), -2))
 
         # Check if adventurer can perform special ability
 
@@ -277,7 +286,6 @@ class Game:
                 for tunnel in all_tunnels:
                     if tunnel.flipped and tunnel != current_tunnel and not tunnel.blocked:
                         possible_actions.append(("use_tunnel", (adventurer, tunnel), 1))
-
 
         return possible_actions
 
@@ -314,9 +322,8 @@ class Game:
         elif action_type == "use_item":
             adventurer = chosen_action[1][0]
             item = chosen_action[1][1]
-
             if isinstance(item, TimeThrottle):
-                pass
+                adventurer.inventory.remove(item)
 
         self.print_game(adventurer, chosen_action)
 
@@ -1066,6 +1073,9 @@ class TimeThrottle:
 
     def __str__(self):
         return self.name
+
+    def __repr__(self):
+        return f"TimeThrottle({self.name})"
 
     def apply(self):
         pass  # TBD
