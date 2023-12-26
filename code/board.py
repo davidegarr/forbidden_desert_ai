@@ -177,12 +177,20 @@ class Game:
         self.set_player_order()
         while not self.is_game_over:
             for adventurer in self.player_order:
+                self.check_solar_shield(adventurer)
                 self.execute_turn(adventurer)
                 if self.is_game_over:
                     #print("Game Over")
                     break
             self.round += 1
             self.turn = 1
+
+    def check_solar_shield(self, current_adventurer):
+        for adventurer in self.adventurers.values():
+            if adventurer.solar_shield_active and adventurer == current_adventurer:
+                adventurer.deactivate_solar_shield()
+                self.log_file.write(f"{adventurer.name}'s Solar Shield has worn off.\n")
+
 
     def set_player_order(self):
         # Find the minimum water level amongst all adventurers
@@ -270,6 +278,8 @@ class Game:
                     elif isinstance(item, DuneBlaster):
                         for tile in adventurer.available_sand():
                             possible_actions.append(("use_item", (adventurer, item, tile), 0))
+                    elif isinstance(item, SolarShield):
+                        possible_actions.append(("use_item", (adventurer, item), 0))
 
         # Check if adventurer can perform special ability
 
@@ -356,6 +366,9 @@ class Game:
             elif isinstance(item, DuneBlaster):
                 tile_to_clear = chosen_action[1][2]
                 item.apply(tile_to_clear)
+                adventurer.inventory.remove(item)
+            elif isinstance(item, SolarShield):
+                item.apply(adventurer)
                 adventurer.inventory.remove(item)
 
         self.print_game(adventurer, chosen_action)
@@ -610,6 +623,7 @@ class Adventurer:
         self.max_water = water  # Maximum water they can carry
         self.inventory = []
         self.boat_parts = []
+        self.solar_shield_active = False
 
     def __str__(self):
         return f"{self.name} ({self.symbol}) at {self.tile.name}. {self.water} water left. Inventory: {self.inventory}"
@@ -745,6 +759,12 @@ class Adventurer:
         self.tile.remove_adventurer(self)
         landing_tile.add_adventurer(self)
         self.tile = landing_tile
+
+    def activate_solar_shield(self):
+        self.solar_shield_active = True
+    
+    def deactivate_solar_shield(self):
+        self.solar_shield_active = False
 
 
 class Archeologist(Adventurer):
@@ -971,7 +991,7 @@ class Deck:
             if isinstance(card, StormCard):
                 card.apply()
             elif isinstance(card, SBDCard):
-                card.apply(self.game)
+                card.apply()
             elif isinstance(card, SPUCard):
                 self.game.increase_storm_level()
                 self.game.log_file.write(f"{card.name}. Storm Level: {self.game.sand_storm_level}. Next turn draw {self.amount} cards.\n\n")
@@ -1014,10 +1034,17 @@ class SBDCard:
         self.name = name
         self.game = game
 
-    def apply(self, tiles): # I dont think we need to pass tiles here? TBD
+    def apply(self):
         self.game.log_file.write(f"{self.name}\n\n")
         for tile in self.game.tiles.values():
-            if not tile.flipped and "tunnel" not in tile.name:
+            # Check if the tile is safe due to being flipped or a tunnel
+            safe_tunnel = tile.flipped and "tunnel" in tile.name
+            
+            # Check if any adventurer on the tile has an active solar shield
+            any_shield_active = any(adventurer.solar_shield_active for adventurer in tile.adventurers)
+            
+            if not safe_tunnel and not any_shield_active:
+                # If the tile isn't safe and no solar shields are active, adventurers lose water
                 for adventurer in tile.adventurers:
                     adventurer.lose_water()
 
@@ -1134,8 +1161,8 @@ class SolarShield:
     def __repr__(self):
         return f"{self.name}"
 
-    def apply(self):
-        pass  # TBD
+    def apply(self, adventurer):
+        adventurer.solar_shield_active = True
 
 
 class TimeThrottle:
