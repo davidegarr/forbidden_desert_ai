@@ -168,7 +168,8 @@ class Game:
         game_state += "Game Board: \n"
         game_state += self.get_board_representation()
         game_state += "\n\nAdventurers:\n"
-        game_state += self.get_adventurers_representation() + "\n\n"
+        game_state += self.get_adventurers_representation() + "\n"
+        game_state += f"Boat parts collected: {self.boat_parts_picked}/4.\n\n"
 
         self.log_file.write(game_state)
 
@@ -247,13 +248,28 @@ class Game:
         for tile in adventurer.available_sand():
             possible_actions.append(("remove_sand", tile, 1))
         
-        # Check if an adventurer can use TImeThrottle from their inventory
-        #if TimeThrottle in adventurer.inventory:
-        
+        # Check if adventurer can use TimeThrottle from their inventory
         if adventurer.inventory:
             for item in adventurer.inventory:
-                if isinstance (item, TimeThrottle):
+                if isinstance(item, TimeThrottle):
                     possible_actions.append(("use_item", (adventurer, item), -2))
+                
+        # Check if any adventurer can use an item:
+        for adventurer in self.adventurers.values():
+            if adventurer.inventory:
+                for item in adventurer.inventory:
+                    if isinstance(item, JetPack):
+                        for tile in adventurer.available_tiles():
+                            possible_actions.append(("use_item", (adventurer, item, tile), 0))
+                    elif isinstance(item, Terrascope):
+                        for tile in self.tiles.values():
+                            if not tile.flipped and tile.name != "storm":
+                                possible_actions.append(("use_item", (adventurer, item, tile), 0))
+                    elif isinstance(item, SecretWaterReserve):
+                        possible_actions.append(("use_item", (adventurer, item), 0))
+                    elif isinstance(item, DuneBlaster):
+                        for tile in adventurer.available_sand():
+                            possible_actions.append(("use_item", (adventurer, item, tile), 0))
 
         # Check if adventurer can perform special ability
 
@@ -326,6 +342,21 @@ class Game:
             item = chosen_action[1][1]
             if isinstance(item, TimeThrottle):
                 adventurer.inventory.remove(item)
+            elif isinstance(item, JetPack):
+                destiny_tile = chosen_action[1][2]
+                adventurer.use_jetpack(destiny_tile)
+                adventurer.inventory.remove(item)
+            elif isinstance(item, Terrascope):
+                tile_to_reveal = chosen_action[1][2]
+                self.log_file.write(f"Tile Revealed: {tile_to_reveal.name}\n\n")
+                adventurer.inventory.remove(item)
+            elif isinstance(item, SecretWaterReserve):
+                item.apply(adventurer)
+                adventurer.inventory.remove(item)
+            elif isinstance(item, DuneBlaster):
+                tile_to_clear = chosen_action[1][2]
+                item.apply(tile_to_clear)
+                adventurer.inventory.remove(item)
 
         self.print_game(adventurer, chosen_action)
 
@@ -336,6 +367,9 @@ class Game:
         elif self.total_sand > 48:
             self.is_game_over = True
             self.log_file.write("Game Over. Adventurers have been buried in the sand.")
+        elif self.sand_storm_level > 15:
+            self.is_game_over = True
+            self.log_file.write("Game Over. Sand Storm is too strong.")
         elif self.all_parts_collected() and self.all_adventurers_on_boat():
             self.is_game_over = True
             self.log_file.write("Game won!")
@@ -427,6 +461,9 @@ class Tile:
         return (
             f"{self.name} at {self.x_coordinate, self.y_coordinate}. Sand: {self.sand}"
         )
+
+    def __repr__(self):
+        return f"{self.name}"
 
     def add_adventurer(self, adventurer):
         self.adventurers.append(adventurer)
@@ -696,6 +733,18 @@ class Adventurer:
     def pick_part(self, part):
         self.tile.boat_parts.remove(part)
         self.boat_parts.append(part)
+
+    def available_tiles(self):
+        available_tiles = []
+        for tile in self.game.tiles.values():
+            if tile.blocked == False and tile.name != "storm":
+                available_tiles.append(tile)
+        return available_tiles
+
+    def use_jetpack(self, landing_tile):
+        self.tile.remove_adventurer(self)
+        landing_tile.add_adventurer(self)
+        self.tile = landing_tile
 
 
 class Archeologist(Adventurer):
@@ -1038,6 +1087,9 @@ class DuneBlaster:
     def __str__(self):
         return self.name
 
+    def __repr__(self):
+        return f"{self.name}"
+    
     def apply(self, tile):
         tile.sand = 0
         tile.blocked = False
@@ -1051,6 +1103,9 @@ class JetPack:
     def __str__(self):
         return self.name
 
+    def __repr__(self):
+        return f"{self.name}"
+
     def apply(self, adventurer, move):
         adventurer.move(move)
 
@@ -1062,6 +1117,9 @@ class Terrascope:
     def __str__(self):
         return self.name
 
+    def __repr__(self):
+        return f"{self.name}"
+
     def apply(self, tile):
         return tile.name
 
@@ -1072,6 +1130,9 @@ class SolarShield:
 
     def __str__(self):
         return self.name
+
+    def __repr__(self):
+        return f"{self.name}"
 
     def apply(self):
         pass  # TBD
@@ -1085,7 +1146,7 @@ class TimeThrottle:
         return self.name
 
     def __repr__(self):
-        return f"TimeThrottle({self.name})"
+        return f"{self.name}"
 
     def apply(self):
         pass  # TBD
@@ -1097,6 +1158,9 @@ class SecretWaterReserve:
 
     def __str__(self):
         return self.name
+
+    def __repr__(self):
+        return f"{self.name}"
 
     def apply(self, adventurer):
         #print(f"{adventurer.name} uses {self.name} on {adventurer.tile.name}.")
