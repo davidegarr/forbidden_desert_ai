@@ -284,7 +284,14 @@ class Game:
         if isinstance(adventurer, Archeologist):
             for tile in adventurer.available_sand():
                 possible_actions.append(("ability", tile, 1))
-    
+        elif isinstance(adventurer, WaterCarrier):
+            if (
+            adventurer.tile.flipped == True
+            and "water" in adventurer.tile.name
+            and self.tile.blocked == False
+            ):
+                possible_actions.append(("ability", adventurer, 1))
+
         # Check if adventurer can pickup a boat piece
         if adventurer.tile.boat_parts and adventurer.tile.flipped and not adventurer.tile.blocked:
             for item in adventurer.tile.boat_parts:
@@ -373,9 +380,12 @@ class Game:
                 item.apply(adventurer)
                 adventurer.inventory.remove(item)
         elif action_type == "ability":
-            tile_to_clear = chosen_action[1]
-            adventurer.ability(tile_to_clear)
-            print("Archeologist ability")
+            if isinstance(adventurer, Archeologist):
+                tile_to_clear = chosen_action[1]
+                adventurer.ability(tile_to_clear)
+                print("Archeologist ability")
+            elif isinstance(adventurer, WaterCarrier):
+                adventurer.ability()
 
         self.print_game(adventurer, chosen_action)
 
@@ -898,13 +908,8 @@ class WaterCarrier(Adventurer):
         super().__init__(name, symbol, tile, game, water)
 
     def ability(self):
-        if (
-            self.tile.flipped == True
-            and "water" in self.tile.name
-            and self.tile.blocked == False
-        ):
-            self.get_water()
-            self.get_water()
+        self.get_water()
+        self.get_water()
 
 
 class Deck:
