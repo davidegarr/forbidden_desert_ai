@@ -191,7 +191,6 @@ class Game:
                 adventurer.deactivate_solar_shield()
                 self.log_file.write(f"{adventurer.name}'s Solar Shield has worn off.\n")
 
-
     def set_player_order(self):
         # Find the minimum water level amongst all adventurers
         min_water_level = min(
@@ -240,7 +239,7 @@ class Game:
 
     def get_possible_actions(self, adventurer):
         possible_actions = []
-
+    
         # Rules: "adventuers can take *up to* 4 actions"
         possible_actions.append(("pass", "pass", 0))
         
@@ -282,7 +281,10 @@ class Game:
                         possible_actions.append(("use_item", (adventurer, item), 0))
 
         # Check if adventurer can perform special ability
-
+        if isinstance(adventurer, Archeologist):
+            for tile in adventurer.available_sand():
+                possible_actions.append(("ability", tile, 1))
+    
         # Check if adventurer can pickup a boat piece
         if adventurer.tile.boat_parts and adventurer.tile.flipped and not adventurer.tile.blocked:
             for item in adventurer.tile.boat_parts:
@@ -314,7 +316,7 @@ class Game:
                 for tunnel in all_tunnels:
                     if tunnel.flipped and tunnel != current_tunnel and not tunnel.blocked:
                         possible_actions.append(("use_tunnel", (adventurer, tunnel), 1))
-
+        
         return possible_actions
 
     def perform_action(self, adventurer, chosen_action):
@@ -370,6 +372,10 @@ class Game:
             elif isinstance(item, SolarShield):
                 item.apply(adventurer)
                 adventurer.inventory.remove(item)
+        elif action_type == "ability":
+            tile_to_clear = chosen_action[1]
+            adventurer.ability(tile_to_clear)
+            print("Archeologist ability")
 
         self.print_game(adventurer, chosen_action)
 
@@ -773,8 +779,8 @@ class Archeologist(Adventurer):
 
     def ability(self, tile_to_clear):
         if tile_to_clear in self.available_sand:
-            tile_to_clear.remove_sand()
-            tile_to_clear.remove_sand()
+            tile_to_clear.clear_sand()
+            tile_to_clear.clear_sand()
 
 
 class Climber(Adventurer):
