@@ -1,4 +1,7 @@
+from collections import deque
 import random
+import copy
+
 
 
 class Game:
@@ -242,7 +245,7 @@ class Game:
     
         # Rules: "adventuers can take *up to* 4 actions"
         possible_actions.append(("pass", "pass", 0))
-        
+        """"
         # Add "move" actions with their corresponding move directions
         for move in adventurer.available_moves():
             possible_actions.append(("move", move, 1))
@@ -279,7 +282,7 @@ class Game:
                             possible_actions.append(("use_item", (adventurer, item, tile), 0))
                     elif isinstance(item, SolarShield):
                         possible_actions.append(("use_item", (adventurer, item), 0))
-
+        """
         # Check if adventurer can perform special ability
         if isinstance(adventurer, Archeologist):
             for tile in adventurer.available_sand():
@@ -291,7 +294,12 @@ class Game:
             and self.tile.blocked == False
             ):
                 possible_actions.append(("ability", adventurer, 1))
-
+        elif isinstance(adventurer, Navigator):
+            for other_adventurer in self.adventurers.values():
+                if other_adventurer.name != "navigator":
+                    for path in adventurer.bfs_other_adventurer_available_paths(other_adventurer).values():
+                        possible_actions.append(("ability", (adventurer, other_adventurer, path), 1))
+        """
         # Check if adventurer can pickup a boat piece
         if adventurer.tile.boat_parts and adventurer.tile.flipped and not adventurer.tile.blocked:
             for item in adventurer.tile.boat_parts:
@@ -323,7 +331,7 @@ class Game:
                 for tunnel in all_tunnels:
                     if tunnel.flipped and tunnel != current_tunnel and not tunnel.blocked:
                         possible_actions.append(("use_tunnel", (adventurer, tunnel), 1))
-        
+        """
         return possible_actions
 
     def perform_action(self, adventurer, chosen_action):
@@ -383,9 +391,14 @@ class Game:
             if isinstance(adventurer, Archeologist):
                 tile_to_clear = chosen_action[1]
                 adventurer.ability(tile_to_clear)
-                print("Archeologist ability")
             elif isinstance(adventurer, WaterCarrier):
                 adventurer.ability()
+            elif isinstance(adventurer, Navigator):
+                navigator = chosen_action[1][0]
+                other_adventurer = chosen_action[1][1]
+                path = chosen_action[1][2]
+                for move in path:
+                    navigator.ability(other_adventurer, move)
 
         self.print_game(adventurer, chosen_action)
 
@@ -788,9 +801,9 @@ class Archeologist(Adventurer):
         super().__init__(name, symbol, tile, game, water)
 
     def ability(self, tile_to_clear):
-        if tile_to_clear in self.available_sand:
-            tile_to_clear.clear_sand()
-            tile_to_clear.clear_sand()
+        if tile_to_clear in self.available_sand():
+            tile_to_clear.remove_sand()
+            tile_to_clear.remove_sand()
 
 
 class Climber(Adventurer):
@@ -886,6 +899,64 @@ class Meteorologist(Adventurer):
 class Navigator(Adventurer):
     def __init__(self, name, symbol, tile, game, water):
         super().__init__(name, symbol, tile, game, water)
+
+    def bfs_other_adventurer_available_paths(self, adventurer):
+        # Navigator can move up to 3 tiles another adventurer
+        max_length = 3
+        initial_position = adventurer.tile
+
+        # Stores as key the tiles visited, and as value the list of moves needed to get there
+        visited_squares = {initial_position: []}
+        
+        queue = deque([(initial_position, [])])
+
+        while queue:
+            current_tile, path = queue.popleft()
+            path_length = len(path)
+
+            if path_length >= max_length:
+                continue
+
+            # Generate available moves from the current tile
+            for move in self.available_moves_in_remote_tile(adventurer, path):
+                new_tile = self.calculate_new_tile(current_tile, move)
+                if new_tile not in visited_squares:
+                    # Add the new tile to the visited squares with the path taken to get there
+                    visited_squares[new_tile] = path + [move]
+                    queue.append((new_tile, path + [move]))
+        
+        # Visited squares contains the available paths that can move the aventurer up to 3 tiles
+        return visited_squares 
+
+
+    def available_moves_in_remote_tile(self, adventurer, path):
+        # Save the original position
+        original_tile = adventurer.tile
+
+        # Temporarily move the adventurer along the path
+        for move in path:
+            dx, dy = move
+            new_x = adventurer.tile.x_coordinate + dx
+            new_y = adventurer.tile.y_coordinate + dy
+            adventurer.tile = self.game.coordinate_to_tile[(new_x, new_y)]
+
+        # Now that the adventurer is "at" the end of the path, calculate available moves
+        available_moves = adventurer.available_moves()
+
+        # Reset the adventurer's position to the original tile
+        adventurer.tile = original_tile
+
+        return available_moves
+
+
+    def calculate_new_tile(self, current_tile, move):
+        dx, dy = move
+        current_x, current_y = current_tile.x_coordinate, current_tile.y_coordinate
+
+        new_x, new_y = current_x + dx, current_y + dy
+        new_tile = self.game.coordinate_to_tile[(new_x, new_y)]
+
+        return new_tile
 
     def ability(self, other_adventurer, move):
         x_move, y_move = move
