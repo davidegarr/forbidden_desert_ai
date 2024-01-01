@@ -297,8 +297,9 @@ class Game:
         elif isinstance(adventurer, Navigator):
             for other_adventurer in self.adventurers.values():
                 if other_adventurer.name != "navigator":
-                    for path in adventurer.bfs_other_adventurer_available_paths(other_adventurer).values():
-                        possible_actions.append(("ability", (adventurer, other_adventurer, path), 1))
+                    if adventurer.bfs_other_adventurer_available_paths(other_adventurer):
+                        for path in adventurer.bfs_other_adventurer_available_paths(other_adventurer).values():
+                            possible_actions.append(("ability", (adventurer, other_adventurer, path), 1))
         """
         # Check if adventurer can pickup a boat piece
         if adventurer.tile.boat_parts and adventurer.tile.flipped and not adventurer.tile.blocked:
@@ -907,7 +908,7 @@ class Navigator(Adventurer):
 
         # Stores as key the tiles visited, and as value the list of moves needed to get there
         visited_squares = {initial_position: []}
-        
+        available_paths = {}
         queue = deque([(initial_position, [])])
 
         while queue:
@@ -924,10 +925,13 @@ class Navigator(Adventurer):
                     # Add the new tile to the visited squares with the path taken to get there
                     visited_squares[new_tile] = path + [move]
                     queue.append((new_tile, path + [move]))
+                    available_paths[new_tile] = path + [move]
         
         # Visited squares contains the available paths that can move the aventurer up to 3 tiles
-        return visited_squares 
-
+        print(available_paths, "\n")
+        if available_paths:
+            return available_paths
+        return None
 
     def available_moves_in_remote_tile(self, adventurer, path):
         # Save the original position
