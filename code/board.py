@@ -1,8 +1,5 @@
 from collections import deque
 import random
-import copy
-
-
 
 class Game:
     def __init__(self, log_file) -> None:
@@ -811,6 +808,27 @@ class Climber(Adventurer):
     def __init__(self, name, symbol, tile, game, water):
         super().__init__(name, symbol, tile, game, water)
 
+    def available_moves(self):
+        valid_moves = []
+        current_x, current_y = self.tile.x_coordinate, self.tile.y_coordinate
+
+        directions = [(-1, 0), (1, 0), (0, 1), (0, -1)]
+
+        for dx, dy in directions:
+            new_x, new_y = current_x + dx, current_y + dy
+
+            # Check if the new coordinates are within board boundaries and not a storm tile
+            if 0 <= new_x <= 4 and 0 <= new_y <= 4:
+                adjacent_tile = self.game.coordinate_to_tile.get((new_x, new_y))
+
+                if (
+                    adjacent_tile
+                    and adjacent_tile.name != "storm"
+                ):
+                    valid_moves.append((dx, dy))
+
+        return valid_moves
+    
 
 class Explorer(Adventurer):
     def __init__(self, name, symbol, tile, game, water):
