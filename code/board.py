@@ -240,9 +240,9 @@ class Game:
     def get_possible_actions(self, adventurer):
         possible_actions = []
     
-        # Rules: "adventuers can take *up to* 4 actions"
+        # Rules: "adventurers can take *up to* 4 actions"
         possible_actions.append(("pass", "pass", 0))
-        """"
+        """
         # Add "move" actions with their corresponding move directions
         for move in adventurer.available_moves():
             possible_actions.append(("move", move, 1))
@@ -288,7 +288,7 @@ class Game:
             if (
             adventurer.tile.flipped == True
             and "water" in adventurer.tile.name
-            and self.tile.blocked == False
+            and adventurer.tile.blocked == False
             ):
                 possible_actions.append(("ability", adventurer, 1))
         elif isinstance(adventurer, Navigator):
@@ -297,6 +297,13 @@ class Game:
                     if adventurer.bfs_other_adventurer_available_paths(other_adventurer):
                         for path in adventurer.bfs_other_adventurer_available_paths(other_adventurer).values():
                             possible_actions.append(("ability", (adventurer, other_adventurer, path), 1))
+        elif isinstance(adventurer, Climber):
+            for other_adventurer in adventurer.tile.adventurers:
+                if other_adventurer != adventurer:
+                    possible_actions.append(("pick_up_adventurer", (adventurer, other_adventurer), 0))
+
+            if adventurer.carrying:
+                possible_actions.append(("drop_off_adventurer", adventurer, 0))
         """
         # Check if adventurer can pickup a boat piece
         if adventurer.tile.boat_parts and adventurer.tile.flipped and not adventurer.tile.blocked:
@@ -397,6 +404,14 @@ class Game:
                 path = chosen_action[1][2]
                 for move in path:
                     navigator.ability(other_adventurer, move)
+        elif action_type == "pick_up_adventurer":
+            climber = chosen_action[1][0]
+            other_adventurer = chosen_action[1][1]
+            
+            climber.pick_up_adventurer(other_adventurer)
+        elif action_type == "drop_off_adventurer":
+            climber = chosen_action [1][0]
+            climber.drop_off_adventurer()
 
         self.print_game(adventurer, chosen_action)
 
@@ -807,6 +822,13 @@ class Archeologist(Adventurer):
 class Climber(Adventurer):
     def __init__(self, name, symbol, tile, game, water):
         super().__init__(name, symbol, tile, game, water)
+        self.carrying = None # Track the adventurer being carried
+    
+    def pick_up_adventurer(self, adventurer_to_pick):
+        self.carrying = adventurer_to_pick
+    
+    def drop_off_adventurer(self):
+        self.carrying = None
 
     def available_moves(self):
         valid_moves = []
@@ -829,6 +851,24 @@ class Climber(Adventurer):
 
         return valid_moves
     
+    def move(self, move_direction):
+        dx, dy = move_direction
+        current_x, current_y = self.tile.x_coordinate, self.tile.y_coordinate
+
+        new_x, new_y = current_x + dx, current_y + dy
+        new_tile = self.game.coordinate_to_tile[(new_x, new_y)]
+
+        self.tile.remove_adventurer(self)
+        new_tile.add_adventurer(self)
+        self.tile = new_tile
+
+        # If carrying another adventurer, update their position too
+        if self.carrying:
+            self.carrying.tile.remove_adventurer(self.carrying)
+            new_tile.add_adventurer(self.carrying)
+            self.carrying.tile = new_tile
+            self.drop_off_adventurer
+
 
 class Explorer(Adventurer):
     def __init__(self, name, symbol, tile, game, water):
