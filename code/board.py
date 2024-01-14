@@ -234,6 +234,9 @@ class Game:
             self.action_points -= action_cost
             self.check_game_status()
 
+        if self.game.adventurer["climber"].carrying:
+            self.game.adventurer["climber"].drop_off_adventurer()
+
         self.turn += 1
         self.deck.draw()  # Draw cards from the StormDeck at the end of every turn
 
@@ -1009,7 +1012,6 @@ class Navigator(Adventurer):
         adventurer.tile = original_tile
 
         return available_moves
-
 
     def calculate_new_tile(self, current_tile, move):
         dx, dy = move
