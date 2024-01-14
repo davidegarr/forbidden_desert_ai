@@ -5,6 +5,7 @@
 - [Requirements](#requirements)
 - [Project structure](#project-structure)
 - [Running the code](#running-the-code)
+- [Contact](#contact)
 
 ## About
 This project aims to use reinforced learning to play and master the cooperative board game [Forbidden Desert](https://en.wikipedia.org/wiki/Forbidden_Desert). The goal is to create an AI model that can efficiently make decisions in the game to optimize the chances of survival and success for the team of adventurers.
@@ -58,3 +59,6 @@ This will generate *game_log.txt*. This file contains the log of all the actions
 ### Turn numbering
 - A number of the format A.B.C is displayed everytime there is a board representation.
     - First digit A represents the round (a round is defined as a turn for each player). Second digit B is the turn (a turn is defined as 4 actions from an adventurer). Third digit C is the action (an action is defined as one of the 4 activities that an adventurer can perform in each turn).
+
+## Contact
+For any inquiries, you can find me on Twitter/X [@DavidEgea_](https://twitter.com/davidegea_).
