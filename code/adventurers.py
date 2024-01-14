@@ -230,6 +230,18 @@ class Climber(Adventurer):
             self.carrying.tile = new_tile
             self.drop_off_adventurer
 
+    def use_tunnel (self, tunnel):
+        # Update the current tile and the adventurer's position
+        self.tile.remove_adventurer(self)
+        tunnel.add_adventurer(self)
+        self.tile = tunnel
+
+        # If carrying another adventurer, update their position too
+        if self.carrying:
+            self.carrying.tile.remove_adventurer(self.carrying)
+            tunnel.add_adventurer(self.carrying)
+            self.carrying.tile = tunnel
+            self.drop_off_adventurer
 
 class Explorer(Adventurer):
     def __init__(self, name, symbol, tile, game, water):
