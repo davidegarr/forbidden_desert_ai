@@ -243,13 +243,15 @@ class Game:
 
         self.turn += 1
         self.deck.draw()  # Draw cards from the StormDeck at the end of every turn
+        if self.deck.mitigated != 0: #Reset the mitigation from Meteorologist to 0
+            self.deck.mitigated = 0
 
     def get_possible_actions(self, adventurer):
         possible_actions = []
     
         # Rules: "adventurers can take *up to* 4 actions"
         possible_actions.append(("pass", "pass", 0))
-        """
+        
         # Add "move" actions with their corresponding move directions
         for move in adventurer.available_moves():
             possible_actions.append(("move", move, 1))
@@ -286,7 +288,7 @@ class Game:
                             possible_actions.append(("use_item", (adventurer, item, tile), 0))
                     elif isinstance(item, SolarShield):
                         possible_actions.append(("use_item", (adventurer, item), 0))
-        """
+        
         # Check if adventurer can perform special ability
         if isinstance(adventurer, Archeologist):
             for tile in adventurer.available_sand():
@@ -311,7 +313,11 @@ class Game:
 
             if adventurer.carrying:
                 possible_actions.append(("drop_off_adventurer", (adventurer), 0))
-    
+        elif isinstance(adventurer, Meteorologist):
+            self.deck.amount_to_draw()
+            if self.deck.amount >= self.deck.mitigated:
+                possible_actions.append(("ability", adventurer, 1)) 
+        
         # Check if adventurer can pickup a boat piece
         if adventurer.tile.boat_parts and adventurer.tile.flipped and not adventurer.tile.blocked:
             for item in adventurer.tile.boat_parts:
@@ -411,6 +417,8 @@ class Game:
                 path = chosen_action[1][2]
                 for move in path:
                     navigator.ability(other_adventurer, move)
+            elif isinstance(adventurer, Meteorologist):
+                adventurer.mitigate()
         elif action_type == "pick_up_adventurer":
             climber = chosen_action[1][0]
             other_adventurer = chosen_action[1][1]

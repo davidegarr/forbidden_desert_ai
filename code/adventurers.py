@@ -243,6 +243,7 @@ class Climber(Adventurer):
             self.carrying.tile = tunnel
             self.drop_off_adventurer
 
+
 class Explorer(Adventurer):
     def __init__(self, name, symbol, tile, game, water):
         super().__init__(name, symbol, tile, game, water)
@@ -326,6 +327,9 @@ class Explorer(Adventurer):
 class Meteorologist(Adventurer):
     def __init__(self, name, symbol, tile, game, water):
         super().__init__(name, symbol, tile, game, water)
+    
+    def mitigate(self):
+        self.game.deck.mitigated += 1
 
 
 class Navigator(Adventurer):

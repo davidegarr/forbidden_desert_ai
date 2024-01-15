@@ -6,6 +6,7 @@ class Deck:
         self.deck = self.create()
         self.discard_pile = []
         self.amount = 0  # Amount to cards to draw
+        self.mitigated = 0
 
     def create(self):
         # create deck of cards
@@ -52,7 +53,7 @@ class Deck:
         Implemented for 5 players.
         """
         if self.game.sand_storm_level <= 1:
-            self.amount = 2
+            self.amount = 2 
         elif 2 <= self.game.sand_storm_level <= 6:
             self.amount = 3
         elif 7 <= self.game.sand_storm_level <= 10:
@@ -76,7 +77,7 @@ class Deck:
     def draw(self):
         drawn_cards = []
         self.amount_to_draw()
-        amount = self.amount
+        amount = self.amount - self.mitigated
         for _ in range(amount):
             if not self.deck:  # Check if the deck is empty. If it is, reshuffle.
                 self.reshuffle()
