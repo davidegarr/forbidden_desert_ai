@@ -359,7 +359,6 @@ class Navigator(Adventurer):
                     available_paths[new_tile] = path + [move]
         
         # Visited squares contains the available paths that can move the aventurer up to 3 tiles
-        print(available_paths, "\n")
         if available_paths:
             return available_paths
         return None
