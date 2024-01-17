@@ -331,6 +331,19 @@ class Meteorologist(Adventurer):
     def mitigate(self):
         self.game.deck.mitigated += 1
 
+    def peek_deck(self):
+        """ 
+        Peek at the number of cards equal to the current storm level, 
+        or the number of cards left on the deck, whichever smaller
+        """
+        self.game.deck.amount_to_draw()
+
+        amount_to_peek = min(len(self.deck), self.game.deck.amount)
+        print(self.deck[-amount_to_peek:])
+        return self.deck[-amount_to_peek:] # Returns top cards without actually removing them
+
+
+
 
 class Navigator(Adventurer):
     def __init__(self, name, symbol, tile, game, water):
