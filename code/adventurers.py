@@ -338,9 +338,9 @@ class Meteorologist(Adventurer):
         """
         self.game.deck.amount_to_draw()
 
-        amount_to_peek = min(len(self.deck), self.game.deck.amount)
-        print(self.deck[-amount_to_peek:])
-        return self.deck[-amount_to_peek:] # Returns top cards without actually removing them
+        amount_to_peek = min(len(self.game.deck), self.game.deck.amount)
+        print(self.game.deck[-amount_to_peek:])
+        return self.game.deck[-amount_to_peek:] # Returns top cards without actually removing them
 
 
 
