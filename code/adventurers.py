@@ -339,8 +339,24 @@ class Meteorologist(Adventurer):
         self.game.deck.amount_to_draw()
 
         amount_to_peek = min(len(self.game.deck), self.game.deck.amount)
-        print(self.game.deck[-amount_to_peek:])
-        return self.game.deck[-amount_to_peek:] # Returns top cards without actually removing them
+        peeked_cards = self.game.deck.deck[-amount_to_peek:]
+        print(peeked_cards)
+        return peeked_cards  # Returns n top cards without actually removing them from the deck
+
+    def possible_choices(self):
+        peeked_cards = self.peek_deck()
+        possible_choices = peeked_cards + [None] # Add None as an option to represent choosing no card
+        return possible_choices
+    
+    def place_card_bottom(self, card):
+        """
+        Places specified card at the bottom of the deck.
+        If no card is chosen, no action is taken.
+        """
+        if card:
+            self.game.deck.deck.remove(card)
+            self.game.deck.deck.insert(0, card)
+
 
 
 
