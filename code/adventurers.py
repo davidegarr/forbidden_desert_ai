@@ -340,7 +340,6 @@ class Meteorologist(Adventurer):
 
         amount_to_peek = min(len(self.game.deck.deck), self.game.deck.amount)
         peeked_cards = self.game.deck.deck[-amount_to_peek:]
-        print(peeked_cards)
         return peeked_cards  # Returns n top cards without actually removing them from the deck
 
     def possible_choices(self):

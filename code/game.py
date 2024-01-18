@@ -246,30 +246,30 @@ class Game:
         if self.deck.mitigated != 0: #Reset the mitigation from Meteorologist to 0
             self.deck.mitigated = 0
 
-    def get_possible_actions(self, adventurer):
+    def get_possible_actions(self, current_adventurer):
+        #print(type(adventurer))
         possible_actions = []
     
         # Rules: "adventurers can take *up to* 4 actions"
         possible_actions.append(("pass", "pass", 0))
         
-        """
         # Add "move" actions with their corresponding move directions
-        for move in adventurer.available_moves():
+        for move in current_adventurer.available_moves():
             possible_actions.append(("move", move, 1))
 
         # Check if the adventurer can flip the current tile:
-        if adventurer.can_flip():
-            possible_actions.append(("flip", adventurer, 1))
+        if current_adventurer.can_flip():
+            possible_actions.append(("flip", current_adventurer, 1))
 
         # Check if adventurer can clear sand from any accesible tile
-        for tile in adventurer.available_sand():
+        for tile in current_adventurer.available_sand():
             possible_actions.append(("remove_sand", tile, 1))
         
         # Check if adventurer can use TimeThrottle from their inventory
-        if adventurer.inventory:
-            for item in adventurer.inventory:
+        if current_adventurer.inventory:
+            for item in current_adventurer.inventory:
                 if isinstance(item, TimeThrottle):
-                    possible_actions.append(("use_item", (adventurer, item), -2))
+                    possible_actions.append(("use_item", (current_adventurer, item), -2))
                 
         # Check if any adventurer can use an item:
         for adventurer in self.adventurers.values():
@@ -289,42 +289,41 @@ class Game:
                             possible_actions.append(("use_item", (adventurer, item, tile), 0))
                     elif isinstance(item, SolarShield):
                         possible_actions.append(("use_item", (adventurer, item), 0))
-        """
-        # Check if adventurer can perform special ability
-        if isinstance(adventurer, Archeologist):
-            for tile in adventurer.available_sand():
-                possible_actions.append(("ability", tile, 1))
-        elif isinstance(adventurer, WaterCarrier):
-            if (
-            adventurer.tile.flipped == True
-            and "water" in adventurer.tile.name
-            and adventurer.tile.blocked == False
-            ):
-                possible_actions.append(("ability", adventurer, 1))
-        elif isinstance(adventurer, Navigator):
-            for other_adventurer in self.adventurers.values():
-                if other_adventurer.name != "navigator":
-                    if adventurer.bfs_other_adventurer_available_paths(other_adventurer):
-                        for path in adventurer.bfs_other_adventurer_available_paths(other_adventurer).values():
-                            possible_actions.append(("ability", (adventurer, other_adventurer, path), 1))
-        elif isinstance(adventurer, Climber):
-            for other_adventurer in adventurer.tile.adventurers:
-                if other_adventurer != adventurer:
-                    possible_actions.append(("pick_up_adventurer", (adventurer, other_adventurer), 0))
 
-            if adventurer.carrying:
-                possible_actions.append(("drop_off_adventurer", (adventurer), 0))
-        elif isinstance(adventurer, Meteorologist):
-            possible_actions.append(("peek_deck", adventurer, 1))
+        # Check if current_adventurer can perform special ability
+        if isinstance(current_adventurer, Archeologist):
+            for tile in current_adventurer.available_sand():
+                possible_actions.append(("ability", tile, 1))
+        elif isinstance(current_adventurer, WaterCarrier):
+            if (
+            current_adventurer.tile.flipped == True
+            and "water" in current_adventurer.tile.name
+            and current_adventurer.tile.blocked == False
+            ):
+                possible_actions.append(("ability", current_adventurer, 1))
+        elif isinstance(current_adventurer, Navigator):
+            for other_adventurer in self.adventurers.values():
+                if other_adventurer != current_adventurer:
+                    if current_adventurer.bfs_other_adventurer_available_paths(other_adventurer):
+                        for path in current_adventurer.bfs_other_adventurer_available_paths(other_adventurer).values():
+                            possible_actions.append(("ability", (current_adventurer, other_adventurer, path), 1))
+        elif isinstance(current_adventurer, Climber):
+            for other_adventurer in current_adventurer.tile.adventurers:
+                if other_adventurer != current_adventurer:
+                    possible_actions.append(("pick_up_adventurer", (current_adventurer, other_adventurer), 0))
+
+            if current_adventurer.carrying:
+                possible_actions.append(("drop_off_adventurer", (current_adventurer), 0))
+        elif isinstance(current_adventurer, Meteorologist):
+            possible_actions.append(("peek_deck", current_adventurer, 1))
             self.deck.amount_to_draw()
             if self.deck.amount >= self.deck.mitigated:
-                possible_actions.append(("mitigate", adventurer, 1)) 
+                possible_actions.append(("mitigate", current_adventurer, 1)) 
             
-        """
         # Check if adventurer can pickup a boat piece
-        if adventurer.tile.boat_parts and adventurer.tile.flipped and not adventurer.tile.blocked:
-            for item in adventurer.tile.boat_parts:
-                possible_actions.append(("pick_part", (adventurer, item), 1))
+        if current_adventurer.tile.boat_parts and current_adventurer.tile.flipped and not current_adventurer.tile.blocked:
+            for item in current_adventurer.tile.boat_parts:
+                possible_actions.append(("pick_part", (current_adventurer, item), 1))
 
         # Sharing items from inventory
         for tile in self.tiles.values():
@@ -332,9 +331,10 @@ class Game:
                 for i, adv in enumerate(tile.adventurers):
                     if adv.inventory:  # Check if adventurer has items to share
                         for other_adventurer in tile.adventurers[i+1:]:
-                            for item in adventurer.inventory:
+                            for item in adv.inventory:  # Use adv.inventory instead of adventurer.inventory
                                 # Add an action for each item the adventurer can share
-                                possible_actions.append(("give_item", (adventurer, other_adventurer, item), 0))
+                                possible_actions.append(("give_item", (adv, other_adventurer, item), 0))
+
 
         # Sharing water between adventurers in the same tile
         for tile in self.tiles.values():
@@ -345,14 +345,14 @@ class Game:
                             possible_actions.append(("give_water", (adventurer, other_adventurer), 0))
 
         # Move between tunnel tiles
-        if isinstance(adventurer.tile, TunnelTile):
-            current_tunnel = adventurer.tile
+        if isinstance(current_adventurer.tile, TunnelTile):
+            current_tunnel = current_adventurer.tile
             if not current_tunnel.blocked and current_tunnel.flipped:
                 all_tunnels = [self.tiles["tunnel_1"], self.tiles["tunnel_2"], self.tiles["tunnel_3"]]
                 for tunnel in all_tunnels:
                     if tunnel.flipped and tunnel != current_tunnel and not tunnel.blocked:
-                        possible_actions.append(("use_tunnel", (adventurer, tunnel), 1))
-        """
+                        possible_actions.append(("use_tunnel", (current_adventurer, tunnel), 1))
+        
         return possible_actions
 
     def perform_action(self, adventurer, chosen_action):
@@ -377,37 +377,37 @@ class Game:
             item = chosen_action[1][2]
             item_giver.give_item(item_reciever, item)
         elif action_type == "pick_part":
-            adventurer = chosen_action[1][0]
+            player = chosen_action[1][0]
             part = chosen_action[1][1]
-            adventurer.pick_part(part)
+            player.pick_part(part)
             self.boat_parts_picked += 1
         elif action_type == "use_tunnel":
-            adventurer = chosen_action[1][0]
+            player = chosen_action[1][0]
             tunnel = chosen_action[1][1] # This is the tunnel that the adventurer is travelling to.
-            adventurer.use_tunnel(tunnel)
+            player.use_tunnel(tunnel)
         elif action_type == "use_item":
-            adventurer = chosen_action[1][0]
+            player = chosen_action[1][0]
             item = chosen_action[1][1]
             if isinstance(item, TimeThrottle):
-                adventurer.inventory.remove(item)
+                player.inventory.remove(item)
             elif isinstance(item, JetPack):
                 destiny_tile = chosen_action[1][2]
-                adventurer.use_jetpack(destiny_tile)
-                adventurer.inventory.remove(item)
+                player.use_jetpack(destiny_tile)
+                player.inventory.remove(item)
             elif isinstance(item, Terrascope):
                 tile_to_reveal = chosen_action[1][2]
                 self.log_file.write(f"Tile Revealed: {tile_to_reveal.name}\n\n")
-                adventurer.inventory.remove(item)
+                player.inventory.remove(item)
             elif isinstance(item, SecretWaterReserve):
                 item.apply(adventurer)
-                adventurer.inventory.remove(item)
+                player.inventory.remove(item)
             elif isinstance(item, DuneBlaster):
                 tile_to_clear = chosen_action[1][2]
                 item.apply(tile_to_clear)
-                adventurer.inventory.remove(item)
+                player.inventory.remove(item)
             elif isinstance(item, SolarShield):
                 item.apply(adventurer)
-                adventurer.inventory.remove(item)
+                player.inventory.remove(item)
         elif action_type == "ability":
             if isinstance(adventurer, Archeologist):
                 tile_to_clear = chosen_action[1]
@@ -492,10 +492,14 @@ class Game:
 
 
 def main():
-    with open("game_log.txt", "w") as log_file:
-        game = Game(log_file)
-        print("Starting game...")
-        game.start_game()
+
+    for i in range(1):
+        log_file_name = f"game_log_{i}.txt"
+        with open(log_file_name, "w") as log_file:
+            game = Game(log_file)
+            print(f"Starting game {i}...")
+            game.start_game()
+
 
 
 if __name__ == "__main__":
