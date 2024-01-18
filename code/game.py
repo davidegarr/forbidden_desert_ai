@@ -252,6 +252,7 @@ class Game:
         # Rules: "adventurers can take *up to* 4 actions"
         possible_actions.append(("pass", "pass", 0))
         
+        """
         # Add "move" actions with their corresponding move directions
         for move in adventurer.available_moves():
             possible_actions.append(("move", move, 1))
@@ -288,7 +289,7 @@ class Game:
                             possible_actions.append(("use_item", (adventurer, item, tile), 0))
                     elif isinstance(item, SolarShield):
                         possible_actions.append(("use_item", (adventurer, item), 0))
-        
+        """
         # Check if adventurer can perform special ability
         if isinstance(adventurer, Archeologist):
             for tile in adventurer.available_sand():
@@ -314,10 +315,12 @@ class Game:
             if adventurer.carrying:
                 possible_actions.append(("drop_off_adventurer", (adventurer), 0))
         elif isinstance(adventurer, Meteorologist):
+            possible_actions.append(("peek_deck", adventurer, 1))
             self.deck.amount_to_draw()
             if self.deck.amount >= self.deck.mitigated:
-                possible_actions.append(("ability", adventurer, 1)) 
-        
+                possible_actions.append(("mitigate", adventurer, 1)) 
+            
+        """
         # Check if adventurer can pickup a boat piece
         if adventurer.tile.boat_parts and adventurer.tile.flipped and not adventurer.tile.blocked:
             for item in adventurer.tile.boat_parts:
@@ -349,7 +352,7 @@ class Game:
                 for tunnel in all_tunnels:
                     if tunnel.flipped and tunnel != current_tunnel and not tunnel.blocked:
                         possible_actions.append(("use_tunnel", (adventurer, tunnel), 1))
-        
+        """
         return possible_actions
 
     def perform_action(self, adventurer, chosen_action):
@@ -417,8 +420,6 @@ class Game:
                 path = chosen_action[1][2]
                 for move in path:
                     navigator.ability(other_adventurer, move)
-            elif isinstance(adventurer, Meteorologist):
-                adventurer.mitigate()
         elif action_type == "pick_up_adventurer":
             climber = chosen_action[1][0]
             other_adventurer = chosen_action[1][1]
@@ -426,6 +427,10 @@ class Game:
         elif action_type == "drop_off_adventurer":
             climber = chosen_action[1]
             climber.drop_off_adventurer()
+        elif action_type == "mitigate":
+            adventurer.mitigate() 
+        elif action_type == "peek_deck":
+            choice = random.choice(adventurer.possible_choices())           
 
         self.print_game(adventurer, chosen_action)
 

@@ -334,16 +334,19 @@ class Meteorologist(Adventurer):
     def peek_deck(self):
         """ 
         Peek at the number of cards equal to the current storm level, 
-        or the number of cards left on the deck, whichever smaller
+        or the number of cards left on the deck, whichever smaller.
         """
         self.game.deck.amount_to_draw()
 
-        amount_to_peek = min(len(self.game.deck), self.game.deck.amount)
+        amount_to_peek = min(len(self.game.deck.deck), self.game.deck.amount)
         peeked_cards = self.game.deck.deck[-amount_to_peek:]
         print(peeked_cards)
         return peeked_cards  # Returns n top cards without actually removing them from the deck
 
     def possible_choices(self):
+        """
+        Returns peeked cards + no card for the AI to choose.
+        """
         peeked_cards = self.peek_deck()
         possible_choices = peeked_cards + [None] # Add None as an option to represent choosing no card
         return possible_choices
@@ -356,10 +359,6 @@ class Meteorologist(Adventurer):
         if card:
             self.game.deck.deck.remove(card)
             self.game.deck.deck.insert(0, card)
-
-
-
-
 
 class Navigator(Adventurer):
     def __init__(self, name, symbol, tile, game, water):
@@ -442,4 +441,3 @@ class WaterCarrier(Adventurer):
     def ability(self):
         self.get_water()
         self.get_water()
-
