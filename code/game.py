@@ -1,3 +1,5 @@
+import os
+import sys
 from adventurers import *
 from geardeck import *
 from stormdeck import *
@@ -491,16 +493,57 @@ class Game:
         return False
 
 
-def main():
+def clear_log_directory(log_dir):
+    if os.path.exists(log_dir):
+        # Remove all files in the directory
+        for filename in os.listdir(log_dir):
+            file_path = os.path.join(log_dir, filename)
+            try:
+                if os.path.isfile(file_path):
+                    os.unlink(file_path)  # Remove the file
+            except Exception as e:
+                print(f"Failed to delete {file_path}. Reason: {e}")
 
-    for i in range(1):
-        log_file_name = f"game_log_{i}.txt"
+
+def main(num_games):
+    highest_round = 0
+    total_rounds = 0
+
+    # Ensure the log directory exists
+    log_dir = "game_logs"
+    os.makedirs(log_dir, exist_ok=True)
+
+    # Clear the log directory
+    clear_log_directory(log_dir)
+
+    for i in range(num_games):
+        log_file_name = os.path.join(log_dir, f"game_log_{i}.txt")
         with open(log_file_name, "w") as log_file:
             game = Game(log_file)
-            print(f"Starting game {i}...")
+            print(f"Starting game {i + 1}...")
             game.start_game()
+            total_rounds += game.round
+            if game.round > highest_round:
+                highest_round = game.round
+
+    average_rounds = total_rounds / num_games
+    print(f"Average rounds per game: {average_rounds}")
+    print(f"Highest round reached in any game: {highest_round}")
 
 
 
 if __name__ == "__main__":
-    main()
+    # Default number of games
+    num_games = 1
+
+    # Check if an argument is provided
+    if len(sys.argv) > 1:
+        try:
+            num_games = int(sys.argv[1])
+            if num_games <= 0:
+                raise ValueError
+        except ValueError:
+            print("Invalid number of games. Please try again.")
+            sys.exit(1)
+    
+    main(num_games)

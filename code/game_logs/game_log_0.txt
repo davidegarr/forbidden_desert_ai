@@ -1,0 +1,948 @@
+Initial State:
+Storm Level: 1
+Game Board: 
+------------------------------------------
+| D6    | S     | Pv(1) | Cv    | Ph    |
+------------------------------------------
+| D1    | D4(1) | D3    | T3(1) | W1    |
+------------------------------------------
+| Gv(1) | Ch    | X     | M     | Mv(1) |
+------------------------------------------
+| D8    | D2(1) | B     | W2(1) | D7    |
+------------------------------------------
+| Gh    | Mh    | T1(1) | D5    | T2    |
+------------------------------------------
+
+Adventurers:
+archeologist (A) at start. 3 water left. Inventory: []
+climber (C) at start. 3 water left. Inventory: []
+explorer (E) at start. 4 water left. Inventory: []
+meteorologist (M) at start. 4 water left. Inventory: []
+navigator (N) at start. 4 water left. Inventory: []
+water_carrier (WC) at start. 5 water left. Inventory: []
+
+ability, propeller_v at (2, 0). Sand: 1
+1.1.1: 
+Storm Level: 1
+archeologist: ability, propeller_v at (2, 0). Sand: 0. Cost: 1.
+Game Board: 
+------------------------------------------
+| D6    | S     | Pv    | Cv    | Ph    |
+------------------------------------------
+| D1    | D4(1) | D3    | T3(1) | W1    |
+------------------------------------------
+| Gv(1) | Ch    | X     | M     | Mv(1) |
+------------------------------------------
+| D8    | D2(1) | B     | W2(1) | D7    |
+------------------------------------------
+| Gh    | Mh    | T1(1) | D5    | T2    |
+------------------------------------------
+
+Adventurers:
+archeologist (A) at start. 3 water left. Inventory: []
+climber (C) at start. 3 water left. Inventory: []
+explorer (E) at start. 4 water left. Inventory: []
+meteorologist (M) at start. 4 water left. Inventory: []
+navigator (N) at start. 4 water left. Inventory: []
+water_carrier (WC) at start. 5 water left. Inventory: []
+Boat parts collected: 0/4.
+
+move, (-1, 0)
+1.1.2: 
+Storm Level: 1
+archeologist: move, (-1, 0). Cost: 1.
+Game Board: 
+------------------------------------------
+| D6    | S     | Pv    | Cv    | Ph    |
+------------------------------------------
+| D1    | D4(1) | D3    | T3(1) | W1    |
+------------------------------------------
+| Gv(1) | Ch    | X     | M     | Mv(1) |
+------------------------------------------
+| D8    | D2(1) | B     | W2(1) | D7    |
+------------------------------------------
+| Gh    | Mh    | T1(1) | D5    | T2    |
+------------------------------------------
+
+Adventurers:
+archeologist (A) at dune_6. 3 water left. Inventory: []
+climber (C) at start. 3 water left. Inventory: []
+explorer (E) at start. 4 water left. Inventory: []
+meteorologist (M) at start. 4 water left. Inventory: []
+navigator (N) at start. 4 water left. Inventory: []
+water_carrier (WC) at start. 5 water left. Inventory: []
+Boat parts collected: 0/4.
+
+flip, archeologist (A) at dune_6. 3 water left. Inventory: []
+1.1.3: 
+Storm Level: 1
+archeologist: flip, archeologist (A) at dune_6. 3 water left. Inventory: [Time Throttle 1/1]. Cost: 1.
+Game Board: 
+------------------------------------------
+| D6    | S     | Pv    | Cv    | Ph    |
+------------------------------------------
+| D1    | D4(1) | D3    | T3(1) | W1    |
+------------------------------------------
+| Gv(1) | Ch    | X     | M     | Mv(1) |
+------------------------------------------
+| D8    | D2(1) | B     | W2(1) | D7    |
+------------------------------------------
+| Gh    | Mh    | T1(1) | D5    | T2    |
+------------------------------------------
+
+Adventurers:
+archeologist (A) at dune_6. 3 water left. Inventory: [Time Throttle 1/1]
+climber (C) at start. 3 water left. Inventory: []
+explorer (E) at start. 4 water left. Inventory: []
+meteorologist (M) at start. 4 water left. Inventory: []
+navigator (N) at start. 4 water left. Inventory: []
+water_carrier (WC) at start. 5 water left. Inventory: []
+Boat parts collected: 0/4.
+
+archeologist (A) at dune_6. 3 water left. Inventory: [Time Throttle 1/1] skips their turn.
+
+Storm Moves x1 1/3, [(1, 0)]
+
+Storm Moves x1 2/3, [(0, 1)]
+
+flip, explorer (E) at start. 4 water left. Inventory: []
+1.2.1: 
+Storm Level: 1
+explorer: flip, explorer (E) at start. 4 water left. Inventory: [Solar Shield 2/2]. Cost: 1.
+Game Board: 
+------------------------------------------
+| D6    | S     | Pv    | Cv    | Ph    |
+------------------------------------------
+| D1    | D4(1) | D3    | T3(1) | W1    |
+------------------------------------------
+| Gv(1) | Ch    | M (1) | W2(2) | Mv(1) |
+------------------------------------------
+| D8    | D2(1) | B     | X     | D7    |
+------------------------------------------
+| Gh    | Mh    | T1(1) | D5    | T2    |
+------------------------------------------
+
+Adventurers:
+archeologist (A) at dune_6. 3 water left. Inventory: [Time Throttle 1/1]
+climber (C) at start. 3 water left. Inventory: []
+explorer (E) at start. 4 water left. Inventory: [Solar Shield 2/2]
+meteorologist (M) at start. 4 water left. Inventory: []
+navigator (N) at start. 4 water left. Inventory: []
+water_carrier (WC) at start. 5 water left. Inventory: []
+Boat parts collected: 0/4.
+
+move, (1, 1)
+1.2.2: 
+Storm Level: 1
+explorer: move, (1, 1). Cost: 1.
+Game Board: 
+------------------------------------------
+| D6    | S     | Pv    | Cv    | Ph    |
+------------------------------------------
+| D1    | D4(1) | D3    | T3(1) | W1    |
+------------------------------------------
+| Gv(1) | Ch    | M (1) | W2(2) | Mv(1) |
+------------------------------------------
+| D8    | D2(1) | B     | X     | D7    |
+------------------------------------------
+| Gh    | Mh    | T1(1) | D5    | T2    |
+------------------------------------------
+
+Adventurers:
+archeologist (A) at dune_6. 3 water left. Inventory: [Time Throttle 1/1]
+climber (C) at start. 3 water left. Inventory: []
+explorer (E) at dune_3. 4 water left. Inventory: [Solar Shield 2/2]
+meteorologist (M) at start. 4 water left. Inventory: []
+navigator (N) at start. 4 water left. Inventory: []
+water_carrier (WC) at start. 5 water left. Inventory: []
+Boat parts collected: 0/4.
+
+remove_sand, dune_4 at (1, 1). Sand: 1
+1.2.3: 
+Storm Level: 1
+explorer: remove_sand, dune_4 at (1, 1). Sand: 0. Cost: 1.
+Game Board: 
+------------------------------------------
+| D6    | S     | Pv    | Cv    | Ph    |
+------------------------------------------
+| D1    | D4    | D3    | T3(1) | W1    |
+------------------------------------------
+| Gv(1) | Ch    | M (1) | W2(2) | Mv(1) |
+------------------------------------------
+| D8    | D2(1) | B     | X     | D7    |
+------------------------------------------
+| Gh    | Mh    | T1(1) | D5    | T2    |
+------------------------------------------
+
+Adventurers:
+archeologist (A) at dune_6. 3 water left. Inventory: [Time Throttle 1/1]
+climber (C) at start. 3 water left. Inventory: []
+explorer (E) at dune_3. 4 water left. Inventory: [Solar Shield 2/2]
+meteorologist (M) at start. 4 water left. Inventory: []
+navigator (N) at start. 4 water left. Inventory: []
+water_carrier (WC) at start. 5 water left. Inventory: []
+Boat parts collected: 0/4.
+
+move, (-1, 1)
+1.2.4: 
+Storm Level: 1
+explorer: move, (-1, 1). Cost: 1.
+Game Board: 
+------------------------------------------
+| D6    | S     | Pv    | Cv    | Ph    |
+------------------------------------------
+| D1    | D4    | D3    | T3(1) | W1    |
+------------------------------------------
+| Gv(1) | Ch    | M (1) | W2(2) | Mv(1) |
+------------------------------------------
+| D8    | D2(1) | B     | X     | D7    |
+------------------------------------------
+| Gh    | Mh    | T1(1) | D5    | T2    |
+------------------------------------------
+
+Adventurers:
+archeologist (A) at dune_6. 3 water left. Inventory: [Time Throttle 1/1]
+climber (C) at start. 3 water left. Inventory: []
+explorer (E) at compass_h. 4 water left. Inventory: [Solar Shield 2/2]
+meteorologist (M) at start. 4 water left. Inventory: []
+navigator (N) at start. 4 water left. Inventory: []
+water_carrier (WC) at start. 5 water left. Inventory: []
+Boat parts collected: 0/4.
+
+Storm Moves x2 2/2, [(1, 0), (1, 0)]
+
+Storm Moves x2 2/2, [(0, 1), (0, 1)]
+
+pick_up_adventurer, (climber, meteorologist)
+1.3.1: 
+Storm Level: 1
+climber: pick_up_adventurer, (climber, meteorologist). Cost: 0.
+Game Board: 
+------------------------------------------
+| D6    | S     | Pv    | Cv    | Ph    |
+------------------------------------------
+| D1    | D4    | D3    | T3(1) | W1    |
+------------------------------------------
+| Gv(1) | Ch    | M (1) | W2(2) | Mv(1) |
+------------------------------------------
+| D8    | D2(1) | B     | D7(1) | T2(1) |
+------------------------------------------
+| Gh    | Mh    | T1(1) | D5    | X     |
+------------------------------------------
+
+Adventurers:
+archeologist (A) at dune_6. 3 water left. Inventory: [Time Throttle 1/1]
+climber (C) at start. 3 water left. Inventory: []
+explorer (E) at compass_h. 4 water left. Inventory: [Solar Shield 2/2]
+meteorologist (M) at start. 4 water left. Inventory: []
+navigator (N) at start. 4 water left. Inventory: []
+water_carrier (WC) at start. 5 water left. Inventory: []
+Boat parts collected: 0/4.
+
+move, (-1, 0)
+1.3.1: 
+Storm Level: 1
+climber: move, (-1, 0). Cost: 1.
+Game Board: 
+------------------------------------------
+| D6    | S     | Pv    | Cv    | Ph    |
+------------------------------------------
+| D1    | D4    | D3    | T3(1) | W1    |
+------------------------------------------
+| Gv(1) | Ch    | M (1) | W2(2) | Mv(1) |
+------------------------------------------
+| D8    | D2(1) | B     | D7(1) | T2(1) |
+------------------------------------------
+| Gh    | Mh    | T1(1) | D5    | X     |
+------------------------------------------
+
+Adventurers:
+archeologist (A) at dune_6. 3 water left. Inventory: [Time Throttle 1/1]
+climber (C) at dune_6. 3 water left. Inventory: []
+explorer (E) at compass_h. 4 water left. Inventory: [Solar Shield 2/2]
+meteorologist (M) at dune_6. 4 water left. Inventory: []
+navigator (N) at start. 4 water left. Inventory: []
+water_carrier (WC) at start. 5 water left. Inventory: []
+Boat parts collected: 0/4.
+
+pick_up_adventurer, (climber, archeologist)
+1.3.2: 
+Storm Level: 1
+climber: pick_up_adventurer, (climber, archeologist). Cost: 0.
+Game Board: 
+------------------------------------------
+| D6    | S     | Pv    | Cv    | Ph    |
+------------------------------------------
+| D1    | D4    | D3    | T3(1) | W1    |
+------------------------------------------
+| Gv(1) | Ch    | M (1) | W2(2) | Mv(1) |
+------------------------------------------
+| D8    | D2(1) | B     | D7(1) | T2(1) |
+------------------------------------------
+| Gh    | Mh    | T1(1) | D5    | X     |
+------------------------------------------
+
+Adventurers:
+archeologist (A) at dune_6. 3 water left. Inventory: [Time Throttle 1/1]
+climber (C) at dune_6. 3 water left. Inventory: []
+explorer (E) at compass_h. 4 water left. Inventory: [Solar Shield 2/2]
+meteorologist (M) at dune_6. 4 water left. Inventory: []
+navigator (N) at start. 4 water left. Inventory: []
+water_carrier (WC) at start. 5 water left. Inventory: []
+Boat parts collected: 0/4.
+
+use_item, (explorer, Solar Shield 2/2)
+1.3.2: 
+Storm Level: 1
+climber: use_item, (explorer, Solar Shield 2/2). Cost: 0.
+Game Board: 
+------------------------------------------
+| D6    | S     | Pv    | Cv    | Ph    |
+------------------------------------------
+| D1    | D4    | D3    | T3(1) | W1    |
+------------------------------------------
+| Gv(1) | Ch    | M (1) | W2(2) | Mv(1) |
+------------------------------------------
+| D8    | D2(1) | B     | D7(1) | T2(1) |
+------------------------------------------
+| Gh    | Mh    | T1(1) | D5    | X     |
+------------------------------------------
+
+Adventurers:
+archeologist (A) at dune_6. 3 water left. Inventory: [Time Throttle 1/1]
+climber (C) at dune_6. 3 water left. Inventory: []
+explorer (E) at compass_h. 4 water left. Inventory: []
+meteorologist (M) at dune_6. 4 water left. Inventory: []
+navigator (N) at start. 4 water left. Inventory: []
+water_carrier (WC) at start. 5 water left. Inventory: []
+Boat parts collected: 0/4.
+
+climber (C) at dune_6. 3 water left. Inventory: [] skips their turn.
+
+Storm Moves x1 2/3, [(0, -1)]
+
+Storm Moves x1 2/3, [(-1, 0)]
+
+water_carrier (WC) at start. 5 water left. Inventory: [] skips their turn.
+
+Storm Moves x1 1/3, [(0, 1)]
+
+Storm Moves x3 1/1, [(1, 0), (1, 0), (1, 0)]
+
+ability, (navigator, archeologist, [(1, 0), (0, 1), (0, 1)])
+1.5.1: 
+Storm Level: 1
+navigator: ability, (navigator, archeologist, [(1, 0), (0, 1), (0, 1)]). Cost: 1.
+Game Board: 
+------------------------------------------
+| D6    | S     | Pv    | Cv    | Ph    |
+------------------------------------------
+| D1    | D4    | D3    | T3(1) | W1    |
+------------------------------------------
+| Gv(1) | Ch    | M (1) | W2(2) | Mv(1) |
+------------------------------------------
+| D8    | D2(1) | B     | D5(1) | D7(2) |
+------------------------------------------
+| Gh    | Mh    | T1(1) | T2(3) | X     |
+------------------------------------------
+
+Adventurers:
+archeologist (A) at compass_h. 3 water left. Inventory: [Time Throttle 1/1]
+climber (C) at dune_6. 3 water left. Inventory: []
+explorer (E) at compass_h. 4 water left. Inventory: []
+meteorologist (M) at dune_6. 4 water left. Inventory: []
+navigator (N) at start. 4 water left. Inventory: []
+water_carrier (WC) at start. 5 water left. Inventory: []
+Boat parts collected: 0/4.
+
+ability, (navigator, explorer, [(0, -1)])
+1.5.2: 
+Storm Level: 1
+navigator: ability, (navigator, explorer, [(0, -1)]). Cost: 1.
+Game Board: 
+------------------------------------------
+| D6    | S     | Pv    | Cv    | Ph    |
+------------------------------------------
+| D1    | D4    | D3    | T3(1) | W1    |
+------------------------------------------
+| Gv(1) | Ch    | M (1) | W2(2) | Mv(1) |
+------------------------------------------
+| D8    | D2(1) | B     | D5(1) | D7(2) |
+------------------------------------------
+| Gh    | Mh    | T1(1) | T2(3) | X     |
+------------------------------------------
+
+Adventurers:
+archeologist (A) at compass_h. 3 water left. Inventory: [Time Throttle 1/1]
+climber (C) at dune_6. 3 water left. Inventory: []
+explorer (E) at dune_4. 4 water left. Inventory: []
+meteorologist (M) at dune_6. 4 water left. Inventory: []
+navigator (N) at start. 4 water left. Inventory: []
+water_carrier (WC) at start. 5 water left. Inventory: []
+Boat parts collected: 0/4.
+
+ability, (navigator, water_carrier, [(1, 0)])
+1.5.3: 
+Storm Level: 1
+navigator: ability, (navigator, water_carrier, [(1, 0)]). Cost: 1.
+Game Board: 
+------------------------------------------
+| D6    | S     | Pv    | Cv    | Ph    |
+------------------------------------------
+| D1    | D4    | D3    | T3(1) | W1    |
+------------------------------------------
+| Gv(1) | Ch    | M (1) | W2(2) | Mv(1) |
+------------------------------------------
+| D8    | D2(1) | B     | D5(1) | D7(2) |
+------------------------------------------
+| Gh    | Mh    | T1(1) | T2(3) | X     |
+------------------------------------------
+
+Adventurers:
+archeologist (A) at compass_h. 3 water left. Inventory: [Time Throttle 1/1]
+climber (C) at dune_6. 3 water left. Inventory: []
+explorer (E) at dune_4. 4 water left. Inventory: []
+meteorologist (M) at dune_6. 4 water left. Inventory: []
+navigator (N) at start. 4 water left. Inventory: []
+water_carrier (WC) at propeller_v. 5 water left. Inventory: []
+Boat parts collected: 0/4.
+
+ability, (navigator, water_carrier, [(-1, 0), (-1, 0), (0, 1)])
+1.5.4: 
+Storm Level: 1
+navigator: ability, (navigator, water_carrier, [(-1, 0), (-1, 0), (0, 1)]). Cost: 1.
+Game Board: 
+------------------------------------------
+| D6    | S     | Pv    | Cv    | Ph    |
+------------------------------------------
+| D1    | D4    | D3    | T3(1) | W1    |
+------------------------------------------
+| Gv(1) | Ch    | M (1) | W2(2) | Mv(1) |
+------------------------------------------
+| D8    | D2(1) | B     | D5(1) | D7(2) |
+------------------------------------------
+| Gh    | Mh    | T1(1) | T2(3) | X     |
+------------------------------------------
+
+Adventurers:
+archeologist (A) at compass_h. 3 water left. Inventory: [Time Throttle 1/1]
+climber (C) at dune_6. 3 water left. Inventory: []
+explorer (E) at dune_4. 4 water left. Inventory: []
+meteorologist (M) at dune_6. 4 water left. Inventory: []
+navigator (N) at start. 4 water left. Inventory: []
+water_carrier (WC) at dune_1. 5 water left. Inventory: []
+Boat parts collected: 0/4.
+
+Storm Moves x1 3/3, [(0, 1)]
+
+Sun Beats Down 3/4
+
+mitigate, meteorologist (M) at dune_6. 4 water left. Inventory: []
+1.6.1: 
+Storm Level: 1
+meteorologist: mitigate, meteorologist (M) at dune_6. 4 water left. Inventory: []. Cost: 1.
+Game Board: 
+------------------------------------------
+| D6    | S     | Pv    | Cv    | Ph    |
+------------------------------------------
+| D1    | D4    | D3    | T3(1) | W1    |
+------------------------------------------
+| Gv(1) | Ch    | M (1) | W2(2) | Mv(1) |
+------------------------------------------
+| D8    | D2(1) | B     | D5(1) | D7(2) |
+------------------------------------------
+| Gh    | Mh    | T1(1) | T2(3) | X     |
+------------------------------------------
+
+Adventurers:
+archeologist (A) at compass_h. 2 water left. Inventory: [Time Throttle 1/1]
+climber (C) at dune_6. 3 water left. Inventory: []
+explorer (E) at dune_4. 3 water left. Inventory: []
+meteorologist (M) at dune_6. 4 water left. Inventory: []
+navigator (N) at start. 3 water left. Inventory: []
+water_carrier (WC) at dune_1. 4 water left. Inventory: []
+Boat parts collected: 0/4.
+
+meteorologist (M) at dune_6. 4 water left. Inventory: [] skips their turn.
+
+Storm Picks Up 2/3. Storm Level: 2. Next turn draw 2 cards.
+
+move, (0, 1)
+2.1.1: 
+Storm Level: 2
+archeologist: move, (0, 1). Cost: 1.
+Game Board: 
+------------------------------------------
+| D6    | S     | Pv    | Cv    | Ph    |
+------------------------------------------
+| D1    | D4    | D3    | T3(1) | W1    |
+------------------------------------------
+| Gv(1) | Ch    | M (1) | W2(2) | Mv(1) |
+------------------------------------------
+| D8    | D2(1) | B     | D5(1) | D7(2) |
+------------------------------------------
+| Gh    | Mh    | T1(1) | T2(3) | X     |
+------------------------------------------
+
+Adventurers:
+archeologist (A) at dune_2. 2 water left. Inventory: [Time Throttle 1/1]
+climber (C) at dune_6. 3 water left. Inventory: []
+explorer (E) at dune_4. 3 water left. Inventory: []
+meteorologist (M) at dune_6. 4 water left. Inventory: []
+navigator (N) at start. 3 water left. Inventory: []
+water_carrier (WC) at dune_1. 4 water left. Inventory: []
+Boat parts collected: 0/4.
+
+move, (0, -1)
+2.1.2: 
+Storm Level: 2
+archeologist: move, (0, -1). Cost: 1.
+Game Board: 
+------------------------------------------
+| D6    | S     | Pv    | Cv    | Ph    |
+------------------------------------------
+| D1    | D4    | D3    | T3(1) | W1    |
+------------------------------------------
+| Gv(1) | Ch    | M (1) | W2(2) | Mv(1) |
+------------------------------------------
+| D8    | D2(1) | B     | D5(1) | D7(2) |
+------------------------------------------
+| Gh    | Mh    | T1(1) | T2(3) | X     |
+------------------------------------------
+
+Adventurers:
+archeologist (A) at compass_h. 2 water left. Inventory: [Time Throttle 1/1]
+climber (C) at dune_6. 3 water left. Inventory: []
+explorer (E) at dune_4. 3 water left. Inventory: []
+meteorologist (M) at dune_6. 4 water left. Inventory: []
+navigator (N) at start. 3 water left. Inventory: []
+water_carrier (WC) at dune_1. 4 water left. Inventory: []
+Boat parts collected: 0/4.
+
+move, (0, 1)
+2.1.3: 
+Storm Level: 2
+archeologist: move, (0, 1). Cost: 1.
+Game Board: 
+------------------------------------------
+| D6    | S     | Pv    | Cv    | Ph    |
+------------------------------------------
+| D1    | D4    | D3    | T3(1) | W1    |
+------------------------------------------
+| Gv(1) | Ch    | M (1) | W2(2) | Mv(1) |
+------------------------------------------
+| D8    | D2(1) | B     | D5(1) | D7(2) |
+------------------------------------------
+| Gh    | Mh    | T1(1) | T2(3) | X     |
+------------------------------------------
+
+Adventurers:
+archeologist (A) at dune_2. 2 water left. Inventory: [Time Throttle 1/1]
+climber (C) at dune_6. 3 water left. Inventory: []
+explorer (E) at dune_4. 3 water left. Inventory: []
+meteorologist (M) at dune_6. 4 water left. Inventory: []
+navigator (N) at start. 3 water left. Inventory: []
+water_carrier (WC) at dune_1. 4 water left. Inventory: []
+Boat parts collected: 0/4.
+
+move, (-1, 0)
+2.1.4: 
+Storm Level: 2
+archeologist: move, (-1, 0). Cost: 1.
+Game Board: 
+------------------------------------------
+| D6    | S     | Pv    | Cv    | Ph    |
+------------------------------------------
+| D1    | D4    | D3    | T3(1) | W1    |
+------------------------------------------
+| Gv(1) | Ch    | M (1) | W2(2) | Mv(1) |
+------------------------------------------
+| D8    | D2(1) | B     | D5(1) | D7(2) |
+------------------------------------------
+| Gh    | Mh    | T1(1) | T2(3) | X     |
+------------------------------------------
+
+Adventurers:
+archeologist (A) at dune_8. 2 water left. Inventory: [Time Throttle 1/1]
+climber (C) at dune_6. 3 water left. Inventory: []
+explorer (E) at dune_4. 3 water left. Inventory: []
+meteorologist (M) at dune_6. 4 water left. Inventory: []
+navigator (N) at start. 3 water left. Inventory: []
+water_carrier (WC) at dune_1. 4 water left. Inventory: []
+Boat parts collected: 0/4.
+
+Storm Moves x3 1/1, [(0, -1), (0, -1), (0, -1)]
+
+Storm Moves x2 1/2, [(0, 1), (0, 1)]
+
+Storm Moves x2 1/2, [(-1, 0), (-1, 0)]
+
+flip, explorer (E) at dune_4. 3 water left. Inventory: []
+2.2.1: 
+Storm Level: 2
+explorer: flip, explorer (E) at dune_4. 3 water left. Inventory: [Dune Blaster 3/3]. Cost: 1.
+Game Board: 
+------------------------------------------
+| D6    | S     | Pv    | Cv    | Ph    |
+------------------------------------------
+| D1    | D4    | D3    | T3(1) | W1(2) |
+------------------------------------------
+| Gv(1) | Ch    | M (1) | W2(2) | Mv(3) |
+------------------------------------------
+| D8    | D2(1) | X     | B (1) | D5(2) |
+------------------------------------------
+| Gh    | Mh    | T1(1) | T2(3) | D7(3) |
+------------------------------------------
+
+Adventurers:
+archeologist (A) at dune_8. 2 water left. Inventory: [Time Throttle 1/1]
+climber (C) at dune_6. 3 water left. Inventory: []
+explorer (E) at dune_4. 3 water left. Inventory: [Dune Blaster 3/3]
+meteorologist (M) at dune_6. 4 water left. Inventory: []
+navigator (N) at start. 3 water left. Inventory: []
+water_carrier (WC) at dune_1. 4 water left. Inventory: []
+Boat parts collected: 0/4.
+
+remove_sand, gem_v at (0, 2). Sand: 1
+2.2.2: 
+Storm Level: 2
+explorer: remove_sand, gem_v at (0, 2). Sand: 0. Cost: 1.
+Game Board: 
+------------------------------------------
+| D6    | S     | Pv    | Cv    | Ph    |
+------------------------------------------
+| D1    | D4    | D3    | T3(1) | W1(2) |
+------------------------------------------
+| Gv    | Ch    | M (1) | W2(2) | Mv(3) |
+------------------------------------------
+| D8    | D2(1) | X     | B (1) | D5(2) |
+------------------------------------------
+| Gh    | Mh    | T1(1) | T2(3) | D7(3) |
+------------------------------------------
+
+Adventurers:
+archeologist (A) at dune_8. 2 water left. Inventory: [Time Throttle 1/1]
+climber (C) at dune_6. 3 water left. Inventory: []
+explorer (E) at dune_4. 3 water left. Inventory: [Dune Blaster 3/3]
+meteorologist (M) at dune_6. 4 water left. Inventory: []
+navigator (N) at start. 3 water left. Inventory: []
+water_carrier (WC) at dune_1. 4 water left. Inventory: []
+Boat parts collected: 0/4.
+
+move, (-1, 1)
+2.2.3: 
+Storm Level: 2
+explorer: move, (-1, 1). Cost: 1.
+Game Board: 
+------------------------------------------
+| D6    | S     | Pv    | Cv    | Ph    |
+------------------------------------------
+| D1    | D4    | D3    | T3(1) | W1(2) |
+------------------------------------------
+| Gv    | Ch    | M (1) | W2(2) | Mv(3) |
+------------------------------------------
+| D8    | D2(1) | X     | B (1) | D5(2) |
+------------------------------------------
+| Gh    | Mh    | T1(1) | T2(3) | D7(3) |
+------------------------------------------
+
+Adventurers:
+archeologist (A) at dune_8. 2 water left. Inventory: [Time Throttle 1/1]
+climber (C) at dune_6. 3 water left. Inventory: []
+explorer (E) at gem_v. 3 water left. Inventory: [Dune Blaster 3/3]
+meteorologist (M) at dune_6. 4 water left. Inventory: []
+navigator (N) at start. 3 water left. Inventory: []
+water_carrier (WC) at dune_1. 4 water left. Inventory: []
+Boat parts collected: 0/4.
+
+flip, explorer (E) at gem_v. 3 water left. Inventory: [Dune Blaster 3/3]
+2.2.4: 
+Storm Level: 2
+explorer: flip, explorer (E) at gem_v. 3 water left. Inventory: [Dune Blaster 3/3]. Cost: 1.
+Game Board: 
+------------------------------------------
+| D6    | S     | Pv    | Cv    | Ph    |
+------------------------------------------
+| D1    | D4    | D3    | T3(1) | W1(2) |
+------------------------------------------
+| Gv    | Ch    | M (1) | W2(2) | Mv(3) |
+------------------------------------------
+| D8    | D2(1) | X     | B (1) | D5(2) |
+------------------------------------------
+| Gh    | Mh    | T1(1) | T2(3) | D7(3) |
+------------------------------------------
+
+Adventurers:
+archeologist (A) at dune_8. 2 water left. Inventory: [Time Throttle 1/1]
+climber (C) at dune_6. 3 water left. Inventory: []
+explorer (E) at gem_v. 3 water left. Inventory: [Dune Blaster 3/3]
+meteorologist (M) at dune_6. 4 water left. Inventory: []
+navigator (N) at start. 3 water left. Inventory: []
+water_carrier (WC) at dune_1. 4 water left. Inventory: []
+Boat parts collected: 0/4.
+
+Storm Moves x2 2/2, [(-1, 0), (-1, 0)]
+
+Storm Picks Up 3/3. Storm Level: 3. Next turn draw 3 cards.
+
+Storm Moves x3 1/1, [(0, 1), (0, 1), (0, 1)]
+
+climber's Solar Shield has worn off.
+pick_up_adventurer, (climber, meteorologist)
+2.3.1: 
+Storm Level: 3
+climber: pick_up_adventurer, (climber, meteorologist). Cost: 0.
+Game Board: 
+------------------------------------------
+| D6    | S     | Pv    | Cv    | Ph    |
+------------------------------------------
+| D1    | D4    | D3    | T3(1) | W1(2) |
+------------------------------------------
+| Gv    | Ch    | M (1) | W2(2) | Mv(3) |
+------------------------------------------
+| Gh(1) | D8(1) | D2(2) | B (1) | D5(2) |
+------------------------------------------
+| X     | Mh    | T1(1) | T2(3) | D7(3) |
+------------------------------------------
+
+Adventurers:
+archeologist (A) at dune_8. 1 water left. Inventory: [Time Throttle 1/1]
+climber (C) at dune_6. 3 water left. Inventory: []
+explorer (E) at gem_v. 3 water left. Inventory: [Dune Blaster 3/3]
+meteorologist (M) at dune_6. 4 water left. Inventory: []
+navigator (N) at start. 3 water left. Inventory: []
+water_carrier (WC) at dune_1. 4 water left. Inventory: []
+Boat parts collected: 0/4.
+
+drop_off_adventurer, climber (C) at dune_6. 3 water left. Inventory: []
+2.3.1: 
+Storm Level: 3
+climber: drop_off_adventurer, climber (C) at dune_6. 3 water left. Inventory: []. Cost: 0.
+Game Board: 
+------------------------------------------
+| D6    | S     | Pv    | Cv    | Ph    |
+------------------------------------------
+| D1    | D4    | D3    | T3(1) | W1(2) |
+------------------------------------------
+| Gv    | Ch    | M (1) | W2(2) | Mv(3) |
+------------------------------------------
+| Gh(1) | D8(1) | D2(2) | B (1) | D5(2) |
+------------------------------------------
+| X     | Mh    | T1(1) | T2(3) | D7(3) |
+------------------------------------------
+
+Adventurers:
+archeologist (A) at dune_8. 1 water left. Inventory: [Time Throttle 1/1]
+climber (C) at dune_6. 3 water left. Inventory: []
+explorer (E) at gem_v. 3 water left. Inventory: [Dune Blaster 3/3]
+meteorologist (M) at dune_6. 4 water left. Inventory: []
+navigator (N) at start. 3 water left. Inventory: []
+water_carrier (WC) at dune_1. 4 water left. Inventory: []
+Boat parts collected: 0/4.
+
+move, (1, 0)
+2.3.1: 
+Storm Level: 3
+climber: move, (1, 0). Cost: 1.
+Game Board: 
+------------------------------------------
+| D6    | S     | Pv    | Cv    | Ph    |
+------------------------------------------
+| D1    | D4    | D3    | T3(1) | W1(2) |
+------------------------------------------
+| Gv    | Ch    | M (1) | W2(2) | Mv(3) |
+------------------------------------------
+| Gh(1) | D8(1) | D2(2) | B (1) | D5(2) |
+------------------------------------------
+| X     | Mh    | T1(1) | T2(3) | D7(3) |
+------------------------------------------
+
+Adventurers:
+archeologist (A) at dune_8. 1 water left. Inventory: [Time Throttle 1/1]
+climber (C) at start. 3 water left. Inventory: []
+explorer (E) at gem_v. 3 water left. Inventory: [Dune Blaster 3/3]
+meteorologist (M) at dune_6. 4 water left. Inventory: []
+navigator (N) at start. 3 water left. Inventory: []
+water_carrier (WC) at dune_1. 4 water left. Inventory: []
+Boat parts collected: 0/4.
+
+move, (0, 1)
+2.3.2: 
+Storm Level: 3
+climber: move, (0, 1). Cost: 1.
+Game Board: 
+------------------------------------------
+| D6    | S     | Pv    | Cv    | Ph    |
+------------------------------------------
+| D1    | D4    | D3    | T3(1) | W1(2) |
+------------------------------------------
+| Gv    | Ch    | M (1) | W2(2) | Mv(3) |
+------------------------------------------
+| Gh(1) | D8(1) | D2(2) | B (1) | D5(2) |
+------------------------------------------
+| X     | Mh    | T1(1) | T2(3) | D7(3) |
+------------------------------------------
+
+Adventurers:
+archeologist (A) at dune_8. 1 water left. Inventory: [Time Throttle 1/1]
+climber (C) at dune_4. 3 water left. Inventory: []
+explorer (E) at gem_v. 3 water left. Inventory: [Dune Blaster 3/3]
+meteorologist (M) at dune_6. 4 water left. Inventory: []
+navigator (N) at start. 3 water left. Inventory: []
+water_carrier (WC) at dune_1. 4 water left. Inventory: []
+Boat parts collected: 0/4.
+
+move, (-1, 0)
+2.3.3: 
+Storm Level: 3
+climber: move, (-1, 0). Cost: 1.
+Game Board: 
+------------------------------------------
+| D6    | S     | Pv    | Cv    | Ph    |
+------------------------------------------
+| D1    | D4    | D3    | T3(1) | W1(2) |
+------------------------------------------
+| Gv    | Ch    | M (1) | W2(2) | Mv(3) |
+------------------------------------------
+| Gh(1) | D8(1) | D2(2) | B (1) | D5(2) |
+------------------------------------------
+| X     | Mh    | T1(1) | T2(3) | D7(3) |
+------------------------------------------
+
+Adventurers:
+archeologist (A) at dune_8. 1 water left. Inventory: [Time Throttle 1/1]
+climber (C) at dune_1. 3 water left. Inventory: []
+explorer (E) at gem_v. 3 water left. Inventory: [Dune Blaster 3/3]
+meteorologist (M) at dune_6. 4 water left. Inventory: []
+navigator (N) at start. 3 water left. Inventory: []
+water_carrier (WC) at dune_1. 4 water left. Inventory: []
+Boat parts collected: 0/4.
+
+climber (C) at dune_1. 3 water left. Inventory: [] skips their turn.
+
+Storm Picks Up 1/3. Storm Level: 4. Next turn draw 3 cards.
+
+Storm Moves x1 3/3, [(-1, 0)]
+
+Storm Moves x2 2/2, [(0, -1), (0, -1)]
+
+use_item, (explorer, Dune Blaster 3/3, gem_v)
+2.4.1: 
+Storm Level: 4
+water_carrier: use_item, (explorer, Dune Blaster 3/3, gem_v). Cost: 0.
+Game Board: 
+------------------------------------------
+| D6    | S     | Pv    | Cv    | Ph    |
+------------------------------------------
+| D1    | D4    | D3    | T3(1) | W1(2) |
+------------------------------------------
+| X     | Ch    | M (1) | W2(2) | Mv(3) |
+------------------------------------------
+| Gv    | D8(1) | D2(2) | B (1) | D5(2) |
+------------------------------------------
+| Gh(2) | Mh    | T1(1) | T2(3) | D7(3) |
+------------------------------------------
+
+Adventurers:
+archeologist (A) at dune_8. 1 water left. Inventory: [Time Throttle 1/1]
+climber (C) at dune_1. 3 water left. Inventory: []
+explorer (E) at gem_v. 2 water left. Inventory: []
+meteorologist (M) at dune_6. 4 water left. Inventory: []
+navigator (N) at start. 3 water left. Inventory: []
+water_carrier (WC) at dune_1. 4 water left. Inventory: []
+Boat parts collected: 0/4.
+
+flip, water_carrier (WC) at dune_1. 4 water left. Inventory: []
+2.4.1: 
+Storm Level: 4
+water_carrier: flip, water_carrier (WC) at dune_1. 4 water left. Inventory: [Terrascope 1/2]. Cost: 1.
+Game Board: 
+------------------------------------------
+| D6    | S     | Pv    | Cv    | Ph    |
+------------------------------------------
+| D1    | D4    | D3    | T3(1) | W1(2) |
+------------------------------------------
+| X     | Ch    | M (1) | W2(2) | Mv(3) |
+------------------------------------------
+| Gv    | D8(1) | D2(2) | B (1) | D5(2) |
+------------------------------------------
+| Gh(2) | Mh    | T1(1) | T2(3) | D7(3) |
+------------------------------------------
+
+Adventurers:
+archeologist (A) at dune_8. 1 water left. Inventory: [Time Throttle 1/1]
+climber (C) at dune_1. 3 water left. Inventory: []
+explorer (E) at gem_v. 2 water left. Inventory: []
+meteorologist (M) at dune_6. 4 water left. Inventory: []
+navigator (N) at start. 3 water left. Inventory: []
+water_carrier (WC) at dune_1. 4 water left. Inventory: [Terrascope 1/2]
+Boat parts collected: 0/4.
+
+use_item, (water_carrier, Terrascope 1/2, tunnel_3)
+Tile Revealed: tunnel_3
+
+2.4.2: 
+Storm Level: 4
+water_carrier: use_item, (water_carrier, Terrascope 1/2, tunnel_3). Cost: 0.
+Game Board: 
+------------------------------------------
+| D6    | S     | Pv    | Cv    | Ph    |
+------------------------------------------
+| D1    | D4    | D3    | T3(1) | W1(2) |
+------------------------------------------
+| X     | Ch    | M (1) | W2(2) | Mv(3) |
+------------------------------------------
+| Gv    | D8(1) | D2(2) | B (1) | D5(2) |
+------------------------------------------
+| Gh(2) | Mh    | T1(1) | T2(3) | D7(3) |
+------------------------------------------
+
+Adventurers:
+archeologist (A) at dune_8. 1 water left. Inventory: [Time Throttle 1/1]
+climber (C) at dune_1. 3 water left. Inventory: []
+explorer (E) at gem_v. 2 water left. Inventory: []
+meteorologist (M) at dune_6. 4 water left. Inventory: []
+navigator (N) at start. 3 water left. Inventory: []
+water_carrier (WC) at dune_1. 4 water left. Inventory: []
+Boat parts collected: 0/4.
+
+water_carrier (WC) at dune_1. 4 water left. Inventory: [] skips their turn.
+
+Sun Beats Down 1/4
+
+Storm Moves x1 1/3, [(-1, 0)]
+
+Storm Moves x3 1/1, [(-1, 0), (-1, 0), (-1, 0)]
+
+ability, (navigator, explorer, [(1, -1), (0, -1)])
+2.5.1: 
+Storm Level: 4
+navigator: ability, (navigator, explorer, [(1, -1), (0, -1)]). Cost: 1.
+Game Board: 
+------------------------------------------
+| D6    | S     | Pv    | Cv    | Ph    |
+------------------------------------------
+| D1    | D4    | D3    | T3(1) | W1(2) |
+------------------------------------------
+| X     | Ch    | M (1) | W2(2) | Mv(3) |
+------------------------------------------
+| Gv    | D8(1) | D2(2) | B (1) | D5(2) |
+------------------------------------------
+| Gh(2) | Mh    | T1(1) | T2(3) | D7(3) |
+------------------------------------------
+
+Adventurers:
+archeologist (A) at dune_8. 0 water left. Inventory: [Time Throttle 1/1]
+climber (C) at dune_1. 2 water left. Inventory: []
+explorer (E) at dune_4. 1 water left. Inventory: []
+meteorologist (M) at dune_6. 3 water left. Inventory: []
+navigator (N) at start. 2 water left. Inventory: []
+water_carrier (WC) at dune_1. 3 water left. Inventory: []
+Boat parts collected: 0/4.
+
+Game over. An adventurer has run out of water.Storm Moves x1 2/3, [(1, 0)]
+
+Storm Moves x1 1/3, [(0, -1)]
+
+Storm Moves x1 3/3, [(0, -1)]
+
