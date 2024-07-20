@@ -358,7 +358,6 @@ class Game:
         return possible_actions
 
     def perform_action(self, adventurer, chosen_action):
-        self.log_file.write(f"{chosen_action[0]}, {chosen_action[1]}\n")
         action_type = chosen_action[0]
         if action_type == "move":
             adventurer.move(chosen_action[1])
